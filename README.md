@@ -1,6 +1,6 @@
 # Glitch - another store?
 
-Yes. 
+Yes. React only and not planning to port to anything else.
 
 ## Motivation: The Why
 
