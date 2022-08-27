@@ -1,6 +1,6 @@
 {
-  "name": "glitch",
-  "version": "0.0.3-alpha",
+  "name": "@activenode/glitch",
+  "version": "0.0.4-alpha",
   "description": "Yes. React 18+ only and not planning to port to anything else. Get your sh*t up-to-date.",
   "main": "index.js",
   "scripts": {},
