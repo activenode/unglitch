@@ -1,11 +1,11 @@
-import equal from 'fast-deep-equal/es6';
-import { useCallback, useSyncExternalStore } from 'react';
-// import { GlobalState } from '../types/state';
-
+import equal from "fast-deep-equal/es6";
+import { useCallback, useSyncExternalStore } from "react";
 
 type UnlockFn = () => boolean;
 
-const createStore = <GlobalState extends object = {}>(initialState: () => GlobalState) => {
+const createStore = <GlobalState extends object = {}>(
+  initialState: () => GlobalState
+) => {
   type PartialState = Partial<GlobalState>;
   type PartialStateReturner = (state: GlobalState) => PartialState;
 
@@ -108,7 +108,4 @@ const createStore = <GlobalState extends object = {}>(initialState: () => Global
   return { useZustand, getSnapshot, update };
 };
 
-
-export { createStore };
-
-
+export const create = createStore;
