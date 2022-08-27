@@ -59,8 +59,8 @@ const createStore = <GlobalState extends object = {}>(
     };
   };
 
-  const useZustand = <R extends unknown = GlobalState>(
-    localReducer: (s: GlobalState) => R = (state) => state as R
+  const useZustand = <R extends unknown>(
+    localReducer: (s: GlobalState) => R
   ): [
     R,
     (
