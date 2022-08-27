@@ -28,7 +28,7 @@ jobs:
           create_tag: "true"
           commit_pattern: "^Release (\\S+)"
           workspace: "."
-          # publish_command: "npm"
+          publish_command: "npm"
           # publish_args: "--non-interactive"
         env: # More info about the environment variables in the README
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this as is, it's automatically generated
