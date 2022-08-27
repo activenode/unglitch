@@ -1,6 +1,6 @@
 {
   "name": "unglitch",
-  "version": "0.0.5-alpha",
+  "version": "0.0.6-alpha",
   "description": "Yes. React 18+ only and not planning to port to anything else. Get your sh*t up-to-date.",
   "main": "dist/index.js",
   "scripts": {
