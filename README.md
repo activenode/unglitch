@@ -30,4 +30,4 @@ This is still pretty much alpha. I created it primarily for my own needs but I'm
 
 ## Contribution Guidelines
 
-Not much but the goal is to keep this free from dependencies (I don't have a problem with `devDependencies` tho).
+Not much but the goal is to keep this free from dependencies (besides `fast-deep-equal`) (I don't have a problem with `devDependencies` tho).
