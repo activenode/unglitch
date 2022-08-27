@@ -2,6 +2,8 @@
 
 Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date.
 
+![](https://media.giphy.com/media/PIRACM2jXRAP1l77tt/giphy.gif)
+
 ## Motivation: The Why
 
 tl;dr:
