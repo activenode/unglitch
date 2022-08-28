@@ -1,3 +1,5 @@
+<img src="unglitch.gif" alt="Logo" style="max-width: 150px" />
+
 # Unglitch - another store?
 
 Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date.
