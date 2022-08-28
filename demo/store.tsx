@@ -10,4 +10,4 @@ const store = createStore<MyState>(() => ({
   bar: "hello",
 }));
 
-export const { useZustand, getSnapshot, update } = store;
+export const { useStore, getSnapshot, update } = store;
