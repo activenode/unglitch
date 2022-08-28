@@ -1,6 +1,4 @@
-<img src="unglitch.gif" alt="Logo" width="150" />
-
-# Unglitch - another store?
+# _Unglitch_ - another store?
 
 Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date.
 
@@ -28,14 +26,30 @@ Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up
 
 3. ```tsx
    // Filename: MyApp.ts
-   import { useZustand, update } from "./store';
+   import { useZustand, update } from "./store";
+   const USER_FETCH_TOKEN = "FETCH_USER";
 
    function App() {
-    const user = useZustand(state => state?.user);
+     const [user, realtimeLock] = useZustand((state) => state?.user);
 
-    useEffect(() => {
+     useEffect(() => {
+       realtimeLock(USER_FETCH_TOKEN, (unlock, realtimeLocalState) => {
+         const _user = realtimeLocalState;
 
-    }, [])
+         if (_user) {
+           // dont fire a request, is apparently in the store
+           // shouldnt happen though as the realtimeLock avoids this
+           return;
+         }
+
+         fetch("/api/user")
+           .then((res) => res.json())
+           .then((json) => {
+             update({ user: json });
+             unlock();
+           });
+       });
+     }, []);
    }
    ```
 
