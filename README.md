@@ -13,45 +13,71 @@ Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up
      user?: {
        prename: string;
        lastname: string;
-       mail: string;
+       mail?: string;
      };
    };
 
    const state: GlobalState = {
-     hostInfoFetching: false,
+     user: {
+       prename: "Spongebob",
+       lastname: "Squarepants",
+     },
    };
 
-   export const { useZustand, update } = create<GlobalState>(() => state);
+   export const { useStore, update } = create<GlobalState>(() => state);
    ```
 
 3. ```tsx
    // Filename: MyApp.ts
-   import { useZustand, update } from "./store";
-   const USER_FETCH_TOKEN = "FETCH_USER";
+   import { useStore, update } from "./store";
 
    function App() {
-     const [user, realtimeLock] = useZustand((state) => state?.user);
+     const [prename] = useStore((state) => state?.user.prename);
 
-     useEffect(() => {
-       realtimeLock(USER_FETCH_TOKEN, (unlock, realtimeLocalState) => {
-         const _user = realtimeLocalState;
-
-         if (_user) {
-           // dont fire a request, is apparently in the store
-           // shouldnt happen though as the realtimeLock avoids this
-           return;
-         }
-
-         fetch("/api/user")
-           .then((res) => res.json())
-           .then((json) => {
-             update({ user: json });
-             unlock();
-           });
-       });
-     }, []);
+     return <div>{prename}</div>;
    }
    ```
+
+# Lock-or-Leave, Lock'n'Release
+
+This mechanism was invented primarily for singleton-like-fetching data but probably has more use-cases. It's not a new idea, it's a token-based lock.
+
+It tries to avoid side-effects of multiple, unnecessary fetches when working with different, independent components. The idea is extremely simple: Everyone can try to fetch but only one will be able to do so and update everyone. Simple, right?
+
+```tsx
+import { useStore, update } from "./store";
+
+function fetchUserData() {
+  // ... fetching logic
+}
+const USER_FETCH_TOKEN = "FETCH_USER";
+
+export function App() {
+  const [state, realtimeLock] = useStore(state => state);
+
+  useEffect(() => {
+    realtimeLock(USER_FETCH_TOKEN, (unlock, realtimeLocalState) => {
+      const _user = realtimeLocalState;
+
+      if (_user) {
+        // dont fire a request as user is apparently already fetched
+        // HOWEVER, this if normally is unnecessary as the realtime lock avoids cubersome situations
+        return;
+      }
+
+      fetchUserData()
+        .then(user => {
+          // say you wanted to only update a subset:
+
+          const existingUser = {...realtimeLocalState};
+
+          // update the store which will inform everyone using useStore
+          update({...existingUser, prename: user.prename});
+          unlock(); // free the lock again
+        })
+  }, []);
+}
+```
 
 ## Motivation: The Why
 
@@ -80,3 +106,7 @@ This is still pretty much alpha. I created it primarily for my own needs but I'm
 ## Contribution Guidelines
 
 Not much but the goal is to keep this free from dependencies (besides `fast-deep-equal`) (I don't have a problem with `devDependencies` tho).
+
+```
+
+```

@@ -59,7 +59,7 @@ const createStore = <GlobalState extends object = {}>(
     };
   };
 
-  const useZustand = <R extends unknown>(
+  const useStore = <R extends unknown>(
     localReducer: (s: GlobalState) => R
   ): [
     R,
@@ -105,7 +105,7 @@ const createStore = <GlobalState extends object = {}>(
     return [reduceStateToLocalState(), _lockedCall];
   };
 
-  return { useZustand, getSnapshot, update };
+  return { useStore, getSnapshot, update };
 };
 
 export const create = createStore;
