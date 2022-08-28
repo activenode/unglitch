@@ -6,6 +6,39 @@ Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up
 
 ![](https://media.giphy.com/media/PIRACM2jXRAP1l77tt/giphy.gif)
 
+# Simple Usage
+
+1. `npm i unglitch`
+2. ```ts
+   // Filename: store.ts
+   type GlobalState = {
+     user?: {
+       prename: string;
+       lastname: string;
+       mail: string;
+     };
+   };
+
+   const state: GlobalState = {
+     hostInfoFetching: false,
+   };
+
+   export const { useZustand, update } = create<GlobalState>(() => state);
+   ```
+
+3. ```tsx
+   // Filename: MyApp.ts
+   import { useZustand, update } from "./store';
+
+   function App() {
+    const user = useZustand(state => state?.user);
+
+    useEffect(() => {
+
+    }, [])
+   }
+   ```
+
 ## Motivation: The Why
 
 tl;dr:
