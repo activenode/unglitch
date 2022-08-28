@@ -1,4 +1,4 @@
-<img src="unglitch.gif" alt="Logo" style="max-width: 150px" />
+<img src="unglitch.gif" alt="Logo" width="150" />
 
 # Unglitch - another store?
 
