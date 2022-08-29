@@ -57,22 +57,19 @@ export function App() {
 
   useEffect(() => {
     realtimeLock(USER_FETCH_TOKEN, (unlock, realtimeLocalState) => {
-      const _user = realtimeLocalState;
-
-      if (_user) {
-        // dont fire a request as user is apparently already fetched
-        // HOWEVER, this if normally is unnecessary as the realtime lock avoids cubersome situations
-        return;
-      }
-
       fetchUserData()
-        .then(user => {
+        .then(({ prename }) => {
           // say you wanted to only update a subset:
-
           const existingUser = {...realtimeLocalState};
 
           // update the store which will inform everyone using useStore
-          update({...existingUser, prename: user.prename});
+          update({
+            user: {
+              ...existingUser,
+              prename
+            }
+          });
+
           unlock(); // free the lock again
         })
   }, []);
