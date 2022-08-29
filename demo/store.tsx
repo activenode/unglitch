@@ -1,11 +1,11 @@
-import { createStore } from "../src"; // from '@activenode/glitch';
+import { create } from "../src";
 
 type MyState = {
   foo: boolean;
   bar: string;
 };
 
-const store = createStore<MyState>(() => ({
+const store = create<MyState>(() => ({
   foo: false,
   bar: "hello",
 }));
