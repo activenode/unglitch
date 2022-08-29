@@ -1,10 +1,10 @@
 # _Unglitch_ - another store?
 
-Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date.
+Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date. No Context Provider needed, hooks only.
 
 ![](https://media.giphy.com/media/PIRACM2jXRAP1l77tt/giphy.gif)
 
-# Simple Usage
+## Simple Usage
 
 1. `npm i unglitch`
 2. ```ts
@@ -38,7 +38,9 @@ Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up
    }
    ```
 
-# Lock-or-Leave, Lock'n'Release
+## Getting the most recent state
+
+## Lock-or-Leave, Lock'n'Release
 
 This mechanism was invented primarily for singleton-like-fetching data but probably has more use-cases. It's not a new idea, it's a token-based lock.
 
@@ -73,6 +75,18 @@ export function App() {
           unlock(); // free the lock again
         })
   }, []);
+}
+```
+
+## Getting the whole state
+
+That's simple:
+
+```tsx
+import { getSnapshot } from "./store";
+
+function MyComponent() {
+  const state = getSnapshot(); // that's it. You can call this wherever you want
 }
 ```
 
