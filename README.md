@@ -51,7 +51,12 @@ It tries to avoid side-effects of multiple, unnecessary fetches when working wit
 ```tsx
 import { useStore, update } from "./store";
 
-const fetchUserData(releaseLock: () => void) {
+const fetchUserData(releaseLock: () => void, currentUserInState) {
+  if (currentUserInState) {
+    // somehow state already has the user, do not fetch
+    return;
+  }
+
   fetch('/api/user')
     .then(r => r.json())
     .then(jsonData => {
