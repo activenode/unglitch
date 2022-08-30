@@ -2,6 +2,12 @@ import equal from "fast-deep-equal/es6";
 import { useCallback, useSyncExternalStore } from "react";
 
 type UnlockFn = () => boolean;
+type LockToken = Symbol | string;
+
+interface LockedCallFunc<R extends unknown> {
+  (unlocker: UnlockFn, accurateLocalState: R): void;
+  LOCK_TOKEN?: LockToken;
+}
 
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
@@ -10,7 +16,7 @@ const createStore = <GlobalState extends object = {}>(
   type PartialStateReturner = (state: GlobalState) => PartialState;
 
   let state: GlobalState = initialState();
-  const locks = new Map();
+  const locks = new Map<LockToken, boolean>();
   const getSnapshot = () => state;
 
   // ===============================
@@ -42,7 +48,7 @@ const createStore = <GlobalState extends object = {}>(
    * Returns the token unlocker if free, else returns false
    * @param token
    */
-  const getLock: (token: string) => UnlockFn | false = (token: string) => {
+  const getLock: (token: LockToken) => UnlockFn | false = (token) => {
     if (locks.has(token)) {
       return false;
     }
@@ -61,13 +67,12 @@ const createStore = <GlobalState extends object = {}>(
 
   const useStore = <R extends unknown>(
     localReducer: (s: GlobalState) => R
-  ): [
-    R,
-    (
-      token: string,
-      fn: (unlocker: UnlockFn, accurateLocalState: R) => void
-    ) => void
-  ] => {
+  ): [R, (fn: LockedCallFunc<R>, token?: LockToken) => void] => {
+    // type LockedCallFunc = (
+    //   unlocker: UnlockFn,
+    //   accurateLocalState: R
+    // ) => void & { LOCK_TOKEN?: LockToken };
+
     const getLiveLocalSnapshot = useCallback(() => {
       return localReducer(getSnapshot());
     }, []);
@@ -90,11 +95,20 @@ const createStore = <GlobalState extends object = {}>(
       return localReducer(syncedLocalState);
     };
 
-    const _lockedCall = (
-      token: string,
-      fn: (unlocker: UnlockFn, accurateLocalState: R) => void
-    ) => {
-      const unlocker = getLock(token);
+    const _lockedTokenizedCall = (fn: LockedCallFunc<R>, token?: LockToken) => {
+      let _token: Symbol | string | undefined = token;
+
+      if (!_token) {
+        _token = fn.LOCK_TOKEN;
+      }
+
+      if (!_token) {
+        throw new Error(
+          "Either provide a token as second param or add a LOCK_TOKEN property to your function"
+        );
+      }
+
+      const unlocker = getLock(token as LockToken);
 
       if (unlocker) {
         // and only then...
@@ -102,7 +116,7 @@ const createStore = <GlobalState extends object = {}>(
       }
     };
 
-    return [reduceStateToLocalState(), _lockedCall];
+    return [reduceStateToLocalState(), _lockedTokenizedCall];
   };
 
   return { useStore, getSnapshot, update };
