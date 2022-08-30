@@ -46,35 +46,44 @@ This mechanism was invented primarily for singleton-like-fetching data but proba
 
 It tries to avoid side-effects of multiple, unnecessary fetches when working with different, independent components. The idea is extremely simple: Everyone can try to fetch but only one will be able to do so and update everyone. Simple, right?
 
+### Explanation Code
+
 ```tsx
 import { useStore, update } from "./store";
 
-function fetchUserData() {
-  // ... fetching logic
+const fetchUserData(releaseLock: () => void) {
+  fetch('/api/user')
+    .then(r => r.json())
+    .then(jsonData => {
+      update({user: jsonData}); // first level gets merged, so dont worry
+    })
+    .finally(releaseLock);
 }
-const USER_FETCH_TOKEN = "FETCH_USER";
+fetchUserData.LOCK_TOKEN = "FETCH_USER_DATA";
+// this is cool, aint it? it will we be automatically grabbed and if a function with
+// that token is already running it will prevent another one running
 
-export function App() {
-  const [state, realtimeLock] = useStore(state => state);
+export function useUser() {
+  const [user, lockedCall] = useStore(state => state.user);
 
   useEffect(() => {
-    realtimeLock(USER_FETCH_TOKEN, (unlock, realtimeLocalState) => {
-      fetchUserData()
-        .then(({ prename }) => {
-          // say you wanted to only update a subset:
-          const existingUser = {...realtimeLocalState};
+    if (!user) {
+      // if we don't have user data we want to fetch it
+      // we use the call locker that will make sure no matter
+      // how often this Hook is used it will always prevent
+      // calling another fetchUserData until it has been released again
+      lockedCall(fetchUserData);
+    }
+  }, [user]);
 
-          // update the store which will inform everyone using useStore
-          update({
-            user: {
-              ...existingUser,
-              prename
-            }
-          });
+  return user;
+}
 
-          unlock(); // free the lock again
-        })
-  }, []);
+
+
+function MyComponent() {
+  const user = useUser();
+  // ...
 }
 ```
 
