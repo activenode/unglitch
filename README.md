@@ -54,6 +54,7 @@ import { useStore, update } from "./store";
 const fetchUserData(releaseLock: () => void, currentUserInState) {
   if (currentUserInState) {
     // somehow state already has the user, do not fetch
+    releaseLock();
     return;
   }
 
