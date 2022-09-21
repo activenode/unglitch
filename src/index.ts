@@ -1,4 +1,4 @@
-import equal from "fast-deep-equal/es6";
+import equal from "fast-deep-equal";
 import { useCallback, useSyncExternalStore } from "react";
 
 type UnlockFn = () => boolean;
