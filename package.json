@@ -2,12 +2,20 @@
   "name": "unglitch",
   "version": "0.0.19-alpha",
   "description": "Yes. React 18+ only and not planning to port to anything else. Get your sh*t up-to-date.",
-  "main": "dist/index.min.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/esm/index.min.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "postbuild": "npx uglify-js dist/index.js -m -c -o dist/index.min.js",
-    "prepublish": "npm run build"
+    "build-cjs": "tsc --project tsconfig.commonjs.json",
+    "postbuild": "npx uglify-js dist/esm/index.js -m -c -o dist/esm/index.min.mjs",
+    "postbuild-cjs": "npx uglify-js dist/cjs/index.js -m -c -o dist/cjs/index.min.cjs",
+    "prepublish": "npm run build && npm "
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/commonjs/useFocusTrap.cjs",
+      "import": "./dist/esm/useFocusTrap.mjs"
+    }
   },
   "files": [
     "dist/"
