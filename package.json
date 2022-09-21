@@ -9,7 +9,7 @@
     "build-cjs": "tsc --project tsconfig.commonjs.json",
     "postbuild": "npx uglify-js dist/esm/index.js -m -c -o dist/esm/index.min.mjs",
     "postbuild-cjs": "npx uglify-js dist/cjs/index.js -m -c -o dist/cjs/index.min.cjs",
-    "prepublish": "npm run build && npm "
+    "prepublish": "npm run build && npm run build-cjs"
   },
   "exports": {
     ".": {
