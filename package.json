@@ -13,8 +13,8 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/commonjs/useFocusTrap.cjs",
-      "import": "./dist/esm/useFocusTrap.mjs"
+      "require": "./dist/cjs/index.min.cjs",
+      "import": "./dist/esm/index.min.mjs"
     }
   },
   "files": [
