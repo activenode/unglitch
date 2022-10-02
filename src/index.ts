@@ -4,8 +4,6 @@ import { useCallback, useSyncExternalStore } from "react";
 type UnlockFn = () => boolean;
 type LockToken = Symbol | string;
 
-const UNGLITCH_LOCK_TOKEN = "UNGLITCH_LOCK_TOKEN";
-
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
 ) => {
@@ -109,8 +107,8 @@ const createStore = <GlobalState extends object = {}>(
    * @param fetchFunc
    * @return refresh function to call the fetcher again (which is only done when lock is free)
    */
-  const useFetchData = <R extends unknown, T extends unknown>(
-    fetchFunc: (set: any) => Promise<T>,
+  const useFetchData = <T extends unknown>(
+    fetchFunc: (set: typeof update) => Promise<T>,
     LOCK_TOKEN?: LockToken
   ) => {
     let token: LockToken = LOCK_TOKEN ?? Symbol();
