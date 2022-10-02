@@ -27,8 +27,19 @@ const createStore = <GlobalState extends object = {}>(
     listeners.forEach((fn) => fn());
   };
 
-  const update = (fn: PartialStateReturner) => {
-    const partialState = fn(state);
+  const update = (updater: PartialStateReturner | PartialState) => {
+    let partialState: PartialState = {};
+
+    switch (typeof updater) {
+      case "function":
+        partialState = updater(state); // pass realtime-state
+        break;
+      case "object":
+        partialState = updater;
+        break;
+    }
+
+    // const partialState = fn(state);
 
     // maybe even do a better merge here, but should be fine for now
     const newState = {
@@ -67,7 +78,7 @@ const createStore = <GlobalState extends object = {}>(
 
   const useStore = <R extends unknown>(
     localReducer: (s: GlobalState) => R
-  ): [R, (fn: LockedCallFunc<R>, token?: LockToken) => void] => {
+  ): Readonly<[R, () => R]> => {
     // type LockedCallFunc = (
     //   unlocker: UnlockFn,
     //   accurateLocalState: R
@@ -95,31 +106,39 @@ const createStore = <GlobalState extends object = {}>(
       return localReducer(syncedLocalState);
     };
 
-    const _lockedTokenizedCall = (fn: LockedCallFunc<R>, token?: LockToken) => {
-      let _token: Symbol | string | undefined = token;
+    const getRealtimeLocalState = () => getLiveLocalSnapshot();
+    return [reduceStateToLocalState(), getRealtimeLocalState] as const;
+  };
 
-      if (!_token) {
-        _token = fn.LOCK_TOKEN;
-      }
+  /**
+   * This function will lock the provided function to be only called once
+   * per point of time. It can only be called another time when the previous
+   * execution is done (Promise resolved -> finally())
+   * @param fetchFunc
+   * @return refresh function to call the fetcher again (which is only done when lock is free)
+   */
+  const useFetchData = <R extends unknown, T extends unknown>(
+    fetchFunc: (set: any) => Promise<T>,
+    LOCK_TOKEN?: LockToken
+  ) => {
+    const token: LockToken = LOCK_TOKEN ?? Symbol();
 
-      if (!_token) {
-        throw new Error(
-          "Either provide a token as second param or add a LOCK_TOKEN property to your function"
-        );
-      }
-
+    const refresh = useCallback(() => {
       const unlocker = getLock(token as LockToken);
 
       if (unlocker) {
-        // and only then...
-        fn(unlocker, getLiveLocalSnapshot());
-      }
-    };
+        // then and ONLY then the lock is currently free!
+        console.log("[Debug]: Lock is free, call it ; Token =", token);
 
-    return [reduceStateToLocalState(), _lockedTokenizedCall];
+        fetchFunc(update).finally(unlocker); // when it's done, we unlock
+      }
+    }, [fetchFunc]);
+
+    refresh();
+    return refresh;
   };
 
-  return { useStore, getSnapshot, update };
+  return { useStore, getSnapshot, update, useFetchData };
 };
 
 export const create = createStore;
