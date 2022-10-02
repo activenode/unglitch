@@ -54,41 +54,29 @@ It tries to avoid side-effects of multiple, unnecessary fetches when working wit
 ```tsx
 import { useStore, update } from "./store";
 
-const fetchUserData(releaseLock: () => void, currentUserInState) {
-  if (currentUserInState) {
-    // somehow state already has the user, do not fetch
-    releaseLock();
-    return;
-  }
-
-  fetch('/api/user')
-    .then(r => r.json())
-    .then(jsonData => {
-      update({user: jsonData}); // first level gets merged, so dont worry
-    })
-    .finally(releaseLock);
-}
-fetchUserData.LOCK_TOKEN = "FETCH_USER_DATA";
-// this is cool, aint it? it will we be automatically grabbed and if a function with
-// that token is already running it will prevent another one running
+const fetchUserData = async (set) => {
+  return fetch("/api/user")
+    .then((r) => r.json())
+    .then((jsonData) => {
+      set({ user: jsonData }); // first level gets merged, so dont worry
+    });
+};
 
 export function useUser() {
-  const [user, lockedCall] = useStore(state => state.user);
+  const [user, getRealtimeUserState] = useStore((state) => state.user);
 
-  useEffect(() => {
-    if (!user) {
-      // if we don't have user data we want to fetch it
-      // we use the call locker that will make sure no matter
-      // how often this Hook is used it will always prevent
-      // calling another fetchUserData until it has been released again
-      lockedCall(fetchUserData);
+  const refreshUserDataAgain = useFetchData((set) => {
+    // we just wanna make sure to make a check that there wasn't
+    // another processing updating the user already hence the user
+    // would be already in the state
+    const realtimeUserState = getRealtimeUserState();
+    if (!realtimeUserState) {
+      return fetchUserData(set);
     }
-  }, [user]);
+  });
 
   return user;
 }
-
-
 
 function MyComponent() {
   const user = useUser();

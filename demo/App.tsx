@@ -25,7 +25,7 @@ export function App() {
       // const [, beforeBar] = realtimeState;
 
       set({
-        bar: "The current time is " + new Date().toLocaleTimeString(),
+        bar: `The current time is  ${new Date().toLocaleTimeString()} `,
       });
     }, 1500);
   });
