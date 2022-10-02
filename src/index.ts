@@ -1,8 +1,10 @@
 import equal from "fast-deep-equal";
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 
 type UnlockFn = () => boolean;
 type LockToken = Symbol | string;
+
+const nonNullOrUndefined = (i: any) => i !== null && i !== undefined;
 
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
@@ -109,12 +111,22 @@ const createStore = <GlobalState extends object = {}>(
    */
   const useFetchData = <T extends unknown>(
     fetchFunc: (set: typeof update) => Promise<T>,
-    LOCK_TOKEN?: LockToken
+    { waitFor, token }: { waitFor?: Array<any>; token?: LockToken } = {}
   ) => {
-    let token: LockToken = LOCK_TOKEN ?? Symbol();
+    let _token: LockToken = token ?? Symbol();
+    const _waitFor = waitFor || [];
+    const waitForDeps = useRef(_waitFor);
+
+    useEffect(() => {
+      waitForDeps.current = _waitFor;
+    }, [..._waitFor]);
 
     const refresh = useCallback(() => {
-      const unlocker = getLock(token as LockToken);
+      if (!waitForDeps.current.every(nonNullOrUndefined)) {
+        return;
+      }
+
+      const unlocker = getLock(_token as LockToken);
 
       if (unlocker) {
         // then and ONLY then the lock is currently free!
@@ -122,9 +134,18 @@ const createStore = <GlobalState extends object = {}>(
 
         fetchFunc(update).finally(unlocker); // when it's done, we unlock
       }
-    }, [fetchFunc]);
+    }, [fetchFunc, waitForDeps]);
 
-    refresh();
+    useEffect(() => {
+      console.log(_waitFor);
+      if (!waitForDeps.current.every(nonNullOrUndefined)) {
+        return;
+      }
+
+      console.log("call refresh");
+      refresh();
+    }, [..._waitFor]);
+
     return refresh;
   };
 
