@@ -1,8 +1,46 @@
-import React from "react";
-import { useStore } from "./store";
+import React, { useEffect } from "react";
+import { useStore, useFetchData } from "./store";
+
+const promiseTimeout = (fn, ms) => {
+  return new Promise((res) => {
+    console.log("inside promise");
+    setTimeout(() => {
+      console.log("inside timeout");
+      res(fn());
+    }, ms);
+  });
+};
 
 export function App() {
-  const [foo] = useStore((state) => state.foo);
+  const [[foo, bar], getRealtimeState] = useStore((state) => [
+    state.foo,
+    state.bar,
+  ]);
 
-  return <div>Foo is currently {foo ? "true" : "false"}</div>;
+  const refresh = useFetchData((set) => {
+    return promiseTimeout(() => {
+      console.log("promiseTimeout is called");
+
+      // const realtimeState = getRealtimeState();
+      // const [, beforeBar] = realtimeState;
+
+      set({
+        bar: "The current time is " + new Date().toLocaleTimeString(),
+      });
+    }, 1500);
+  });
+
+  useEffect(() => {
+    const i = setInterval(refresh, 20);
+    // this is not clever but its super-safe as the fetching will only be called
+    // when the previous one is released
+    return window.clearInterval(i);
+  }, []);
+
+  return (
+    <>
+      <div>Foo is currently {foo ? "true" : "false"}</div>
+      <p>Bar = "{bar}"</p>
+    </>
+  );
 }
