@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore, useFetchData } from "./store";
 
 const promiseTimeout = (fn, ms) => {
@@ -17,24 +17,44 @@ export function App() {
     state.bar,
   ]);
 
-  const refresh = useFetchData((set) => {
-    return promiseTimeout(() => {
-      console.log("promiseTimeout is called");
-
-      // const realtimeState = getRealtimeState();
-      // const [, beforeBar] = realtimeState;
-
-      set({
-        bar: `The current time is  ${new Date().toLocaleTimeString()} `,
-      });
-    }, 1500);
-  });
+  const [waitSampleValue, setWaitSampleValue] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const i = setInterval(refresh, 20);
+    const t = setTimeout(() => {
+      setWaitSampleValue(true);
+    }, 3000);
+
+    return () => clearTimeout(t);
+  });
+
+  const refresh = useFetchData(
+    (set) => {
+      return promiseTimeout(() => {
+        console.log("promiseTimeout is called");
+
+        // const realtimeState = getRealtimeState();
+        // const [, beforeBar] = realtimeState;
+
+        set({
+          bar: `The current time is  ${new Date().toLocaleTimeString()} `,
+        });
+      }, 1500);
+    },
+    {
+      token: "UNIQUE_TOKEN",
+      waitFor: [waitSampleValue],
+    }
+  );
+
+  console.log({ waitSampleValue });
+
+  useEffect(() => {
+    const i = setInterval(() => {
+      refresh();
+    }, 20);
     // this is not clever but its super-safe as the fetching will only be called
     // when the previous one is released
-    return window.clearInterval(i);
+    return () => window.clearInterval(i);
   }, []);
 
   return (
