@@ -84,6 +84,57 @@ function MyComponent() {
 }
 ```
 
+### Understanding `useFetchData` and it's refresh function
+
+`useFetchData` is more than just for "server fetching". It's for any kind of data processing that will take more time than "immediate" execution. And it ensures via the `LOCK_TOKEN` system that you can call it as often as you want without being scared that it will be ran too often. It can't. It's locked until the returned Promise is released (either through error or through successfully resolving it).
+
+Now assume you are loading news data from a blog
+
+```tsx
+const [articles] = useStore((state) => state.articles);
+```
+
+but we also need to fetch them, right?
+
+```tsx
+const refreshArticles = useFetchData(async (set) => {
+  const articles = await loadArticles();
+  set({ articles });
+});
+```
+
+Now this will make sure that data is loaded initially but since the function is anonymous `async (set) ...` we have the problem that the system can't know that this is the same function when being called again in another instance of a component. So we need a `LOCK_TOKEN` in here.
+
+```tsx
+const refreshArticles = useFetchData(async (set) => {
+  const articles = await loadArticles();
+  set({ articles });
+}, "REFRESH_ARTICLES" /** here we go **/);
+```
+
+Now we're good to go. The function will be called exactly once initially and will block any other calls to it until resolved. You can bruteforce-check this behaviour by using the `refreshArticles` function.
+
+This would call and update the `loadArticles` again - but only if the previous one is done. If not, it get's thrown away. This makes sense because when loading articles is still processing you don't want to start another process.
+
+For initial loading, the best performance is achieved when you combine it with local state reduction as seen above and grab the most recent local state to check if it's **actually** empty (if you know your own architecture you probably don't need this but if you work in a big environment this is useful):
+
+```tsx
+const [articles, getRealtimeArticlesState] = useStore(
+  (state) => state.articles
+);
+
+const refreshArticles = useFetchData(async (set) => {
+  if (!getRealtimeArticlesState()) {
+    // data is clearly EMPTY !
+    const articles = await loadArticles();
+    set({ articles });
+  }
+}, "REFRESH_ARTICLES" /** here we go **/);
+```
+
+This sample however will never ever be able to refresh the articles because at the first point where
+data is not empty it will never execute `loadArticles()` again.
+
 ## Getting the whole state
 
 That's simple:
