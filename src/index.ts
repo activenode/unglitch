@@ -4,10 +4,7 @@ import { useCallback, useSyncExternalStore } from "react";
 type UnlockFn = () => boolean;
 type LockToken = Symbol | string;
 
-interface LockedCallFunc<R extends unknown> {
-  (unlocker: UnlockFn, accurateLocalState: R): void;
-  LOCK_TOKEN?: LockToken;
-}
+const UNGLITCH_LOCK_TOKEN = "UNGLITCH_LOCK_TOKEN";
 
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
@@ -79,11 +76,6 @@ const createStore = <GlobalState extends object = {}>(
   const useStore = <R extends unknown>(
     localReducer: (s: GlobalState) => R
   ): Readonly<[R, () => R]> => {
-    // type LockedCallFunc = (
-    //   unlocker: UnlockFn,
-    //   accurateLocalState: R
-    // ) => void & { LOCK_TOKEN?: LockToken };
-
     const getLiveLocalSnapshot = useCallback(() => {
       return localReducer(getSnapshot());
     }, []);
@@ -121,7 +113,7 @@ const createStore = <GlobalState extends object = {}>(
     fetchFunc: (set: any) => Promise<T>,
     LOCK_TOKEN?: LockToken
   ) => {
-    const token: LockToken = LOCK_TOKEN ?? Symbol();
+    let token: LockToken = LOCK_TOKEN ?? Symbol();
 
     const refresh = useCallback(() => {
       const unlocker = getLock(token as LockToken);
