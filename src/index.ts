@@ -150,6 +150,8 @@ const createStore = <GlobalState extends object = {}>(
       }
 
       refresh();
+      // TODO: this could lead to this being called again when waitFor changes
+      // * Maybe use a state to check if it was called already?
     }, [...(waitFor || [])]);
 
     return refresh;
