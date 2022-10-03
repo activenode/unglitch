@@ -101,9 +101,35 @@ useFetchData(
       set({ foo, bar });
     }
   },
-  { token: "FETCH_DATA", waitFor: [/**foo*/ true, /** bar */ "hello"] }
+  { token: "FETCH_DATA", waitFor: [/**foo*/ true, /** bar */ "hello"] as const }
 );
 ```
+
+> Always use `const` in `waitFor` to have the best TypeScript type inference.
+
+### Understanding `waitFor`
+
+The `waitFor` is kinda similiar to a dependency array in hooks.
+The difference is: The function in `useFetchData` is not called when those values are/go to `null | undefined`. That's actually cool, check the following sample:
+
+```tsx
+const refreshUserData = useFetchData(
+  (set, loginData) => {
+    // You don't need to check if `loginData`
+    // is empty. It is not!
+
+    fetchFromMyDatabase.where({ user_id: loginData.user_id }).then((user) => {
+      set({ user });
+    });
+  },
+  {
+    token: "FETCH_DATA",
+    waitFor: [someLoginData] as const,
+  }
+);
+```
+
+Now the coolest thing is: When `someLoginData` goes nullish/undefined then calling `refreshUserData` will also not execute, no matter how often you call it, it will just silently go void.
 
 ### Understanding `useFetchData` and it's refresh function
 
