@@ -94,9 +94,6 @@ The function is memoized and _cannot_ be updated the usual way. Instead use `wai
 ```tsx
 useFetchData(
   (set, foo, bar) => {
-    // we just wanna make sure to make a check that there wasn't
-    // another processing updating the user already hence the user
-    // would be already in the state
     if (foo === true && bar === "hello") {
       set({ foo, bar });
     }
