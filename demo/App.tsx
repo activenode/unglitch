@@ -28,9 +28,17 @@ export function App() {
   });
 
   const refresh = useFetchData(
-    (set) => {
+    (set, ...functionParams) => {
       return promiseTimeout(() => {
-        console.log("promiseTimeout is called");
+        const sampleValue = functionParams[0];
+        const keksValue = functionParams[2];
+
+        console.log(
+          "promiseTimeout is called",
+          waitSampleValue,
+          "should be true",
+          { sampleValue, keksValue }
+        );
 
         // const realtimeState = getRealtimeState();
         // const [, beforeBar] = realtimeState;
@@ -42,7 +50,7 @@ export function App() {
     },
     {
       token: "UNIQUE_TOKEN",
-      waitFor: [waitSampleValue],
+      waitFor: [waitSampleValue, false, "keks"] as const,
     }
   );
 
