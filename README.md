@@ -65,15 +65,18 @@ const fetchUserData = async (set) => {
 export function useUser() {
   const [user, getRealtimeUserState] = useStore((state) => state.user);
 
-  const refreshUserDataAgain = useFetchData((set) => {
-    // we just wanna make sure to make a check that there wasn't
-    // another processing updating the user already hence the user
-    // would be already in the state
-    const realtimeUserState = getRealtimeUserState();
-    if (!realtimeUserState) {
-      return fetchUserData(set);
-    }
-  });
+  const refreshUserDataAgain = useFetchData(
+    (set) => {
+      // we just wanna make sure to make a check that there wasn't
+      // another processing updating the user already hence the user
+      // would be already in the state
+      const realtimeUserState = getRealtimeUserState();
+      if (!realtimeUserState) {
+        return fetchUserData(set);
+      }
+    },
+    { token: "FETCH_USER_DATA" }
+  );
 
   return user;
 }
@@ -82,6 +85,24 @@ function MyComponent() {
   const user = useUser();
   // ...
 }
+```
+
+### My function provided in `useFetchData` isn't updated
+
+The function is memoized and _cannot_ be updated the usual way. Instead use `waitFor` for updating it's provided values inside of it.
+
+```tsx
+useFetchData(
+  (set, foo, bar) => {
+    // we just wanna make sure to make a check that there wasn't
+    // another processing updating the user already hence the user
+    // would be already in the state
+    if (foo === true && bar === "hello") {
+      set({ foo, bar });
+    }
+  },
+  { token: "FETCH_DATA", waitFor: [/**foo*/ true, /** bar */ "hello"] }
+);
 ```
 
 ### Understanding `useFetchData` and it's refresh function
