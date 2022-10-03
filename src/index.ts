@@ -109,13 +109,20 @@ const createStore = <GlobalState extends object = {}>(
    * @param fetchFunc
    * @return refresh function to call the fetcher again (which is only done when lock is free)
    */
-  const useFetchData = <T extends unknown>(
-    fetchFunc: (set: typeof update) => Promise<T>,
-    { waitFor, token }: { waitFor?: Array<any>; token?: LockToken } = {}
+  const useFetchData = <
+    T extends unknown,
+    R extends unknown,
+    FuncParams extends readonly R[]
+  >(
+    fetchFunc: (
+      set: typeof update,
+      ...funcParams: Readonly<FuncParams>
+    ) => Promise<T>,
+    { waitFor, token }: { waitFor?: FuncParams; token?: LockToken } = {}
   ) => {
     let _token: LockToken = token ?? Symbol();
-    const _waitFor = waitFor || [];
-    const waitForDeps = useRef(_waitFor);
+    const _waitFor: FuncParams | [] = waitFor || [];
+    const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
 
     useEffect(() => {
       waitForDeps.current = _waitFor;
@@ -130,21 +137,20 @@ const createStore = <GlobalState extends object = {}>(
 
       if (unlocker) {
         // then and ONLY then the lock is currently free!
-        console.log("[Debug]: Lock is free, call it ; Token =", token);
-
-        fetchFunc(update).finally(unlocker); // when it's done, we unlock
+        // console.log("[Debug]: Lock is free, call it ; Token =", token);
+        fetchFunc(update, ...(waitForDeps.current as FuncParams)).finally(
+          unlocker
+        ); // when it's done, we unlock
       }
-    }, [fetchFunc, waitForDeps]);
+    }, [fetchFunc]);
 
     useEffect(() => {
-      console.log(_waitFor);
       if (!waitForDeps.current.every(nonNullOrUndefined)) {
         return;
       }
 
-      console.log("call refresh");
       refresh();
-    }, [..._waitFor]);
+    }, [...(waitFor || [])]);
 
     return refresh;
   };
