@@ -123,6 +123,7 @@ const createStore = <GlobalState extends object = {}>(
     let _token: LockToken = token ?? Symbol();
     const _waitFor: FuncParams | [] = waitFor || [];
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
+    const hadInitialCallRef = useRef(false);
 
     useEffect(() => {
       waitForDeps.current = _waitFor;
@@ -149,6 +150,11 @@ const createStore = <GlobalState extends object = {}>(
         return;
       }
 
+      if (hadInitialCallRef.current) {
+        return;
+      }
+
+      hadInitialCallRef.current = true;
       refresh();
       // TODO: this could lead to this being called again when waitFor changes
       // * Maybe use a state to check if it was called already?
