@@ -1,6 +1,6 @@
 {
   "name": "unglitch",
-  "version": "0.4.0-alpha",
+  "version": "0.5.0-beta",
   "description": "Yes. React 18+ only and not planning to port to anything else. Get your sh*t up-to-date.",
   "main": "dist/esm/index.min.js",
   "types": "dist/types/index.d.ts",
