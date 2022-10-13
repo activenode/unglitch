@@ -51,6 +51,10 @@ export function App() {
     {
       token: "UNIQUE_TOKEN",
       waitFor: [waitSampleValue, false, "keks"] as const,
+      allow: (isInitialCall) => {
+        console.log({ isInitialCall });
+        return isInitialCall;
+      },
     }
   );
 

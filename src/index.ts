@@ -118,7 +118,15 @@ const createStore = <GlobalState extends object = {}>(
       set: typeof update,
       ...funcParams: Readonly<FuncParams>
     ) => Promise<T>,
-    { waitFor, token }: { waitFor?: FuncParams; token?: LockToken } = {}
+    {
+      waitFor,
+      token,
+      allow,
+    }: {
+      waitFor?: FuncParams;
+      token?: LockToken;
+      allow?: (isInitialCall: boolean) => boolean;
+    } = {}
   ) => {
     let _token: LockToken = token ?? Symbol();
     const _waitFor: FuncParams | [] = waitFor || [];
@@ -129,21 +137,34 @@ const createStore = <GlobalState extends object = {}>(
       waitForDeps.current = _waitFor;
     }, [..._waitFor]);
 
-    const refresh = useCallback(() => {
-      if (!waitForDeps.current.every(nonNullOrUndefined)) {
-        return;
-      }
+    const refresh = useCallback(
+      (isInitialCall = false) => {
+        if (!waitForDeps.current.every(nonNullOrUndefined)) {
+          return;
+        }
 
-      const unlocker = getLock(_token as LockToken);
+        if (allow && !allow(isInitialCall)) {
+          return; // not allowed to execute
+        }
 
-      if (unlocker) {
-        // then and ONLY then the lock is currently free!
-        // console.log("[Debug]: Lock is free, call it ; Token =", token);
-        fetchFunc(update, ...(waitForDeps.current as FuncParams)).finally(
-          unlocker
-        ); // when it's done, we unlock
-      }
-    }, [fetchFunc]);
+        const unlocker = getLock(_token as LockToken);
+
+        if (unlocker) {
+          // then and ONLY then the lock is currently free!
+          // console.log("[Debug]: Lock is free, call it ; Token =", token);
+          fetchFunc(update, ...(waitForDeps.current as FuncParams)).finally(
+            unlocker
+          ); // when it's done, we unlock
+        }
+      },
+      [fetchFunc, allow]
+    );
+
+    const refreshFuncRef = useRef<(isInitialCall: boolean) => void>(refresh);
+
+    useEffect(() => {
+      refreshFuncRef.current = refresh;
+    }, [refresh]);
 
     useEffect(() => {
       if (!waitForDeps.current.every(nonNullOrUndefined)) {
@@ -154,13 +175,15 @@ const createStore = <GlobalState extends object = {}>(
         return;
       }
 
+      // The following only means that the call tried to execute
+      // - it doesn't necessarily mean that it got the lock
+      // and ACTUALLy executed/won the function call
+      // so tldr: it means: all deps were ready and the call was "tried"
       hadInitialCallRef.current = true;
-      refresh();
-      // TODO: this could lead to this being called again when waitFor changes
-      // * Maybe use a state to check if it was called already?
-    }, [...(waitFor || [])]);
+      refreshFuncRef.current(true);
+    }, [refreshFuncRef, ...(waitFor || [])]);
 
-    return refresh;
+    return () => refresh(false);
   };
 
   return { useStore, getSnapshot, update, useFetchData };
