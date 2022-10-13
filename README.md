@@ -75,7 +75,13 @@ export function useUser() {
         return fetchUserData(set);
       }
     },
-    { token: "FETCH_USER_DATA" }
+    {
+      token: "FETCH_USER_DATA",
+
+      // other optional options:
+      waitFor: [],
+      allow: (isInitialCall) => true,
+    }
   );
 
   return user;
@@ -178,6 +184,28 @@ const refreshArticles = useFetchData(async (set) => {
 
 This sample however will never ever be able to refresh the articles because at the first point where
 data is not empty it will never execute `loadArticles()` again.
+
+### What does `allow` do?
+
+Use-case: Say you want to fetch initial data. You use that same hook in multiple places (so you are using the same token).
+
+Now imagine the following:
+
+- In another place `userData` already had been loaded, so it's in the state
+- In this situation you wouldn't want to call the "initial fetcher" so you need something like `IF initial AND notEmpty(userData) THEN dont-fetch`
+
+But you would still like to be able to fetch again via the `refresh` function when you want to refresh the data.
+
+This is easy:
+
+```ts
+//...
+options = {
+  allow: (isInitialCall) => {
+    return !getState().userData || !isInitialCall;
+  },
+};
+```
 
 ## Getting the whole state
 
