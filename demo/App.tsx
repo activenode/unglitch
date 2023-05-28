@@ -27,7 +27,7 @@ export function App() {
     return () => clearTimeout(t);
   });
 
-  const { refresh, isFetching } = useFetchData(
+  const { refresh, isFetching, data } = useFetchData(
     (set, ...functionParams) => {
       return promiseTimeout(() => {
         const sampleValue = functionParams[0];
@@ -51,10 +51,13 @@ export function App() {
     {
       token: "UNIQUE_TOKEN",
       waitFor: [waitSampleValue, false, "keks"] as const,
+      data(s) {
+        return s.bar;
+      },
     }
   );
 
-  console.log({ waitSampleValue });
+  console.log({ waitSampleValue, dataThatUseFetchDataReturns: data });
 
   useEffect(() => {
     const i = setInterval(() => {

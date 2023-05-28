@@ -126,7 +126,7 @@ const createStore = <GlobalState extends object = {}>(
     return [reduceStateToLocalState(), getRealtimeLocalState] as const;
   };
 
-  const useLockData = (token: LockToken) => {
+  const useLockMetadata = (token: LockToken) => {
     const [{ isFetching }] = useStore((s) => {
       return {
         isFetching: ((s as any)?.[UNIQUE_STORE_SYMBOL] as TokenDataContainer)?.[
@@ -162,7 +162,8 @@ const createStore = <GlobalState extends object = {}>(
   const useFetchData = <
     T extends unknown,
     R extends unknown,
-    FuncParams extends readonly R[]
+    FuncParams extends readonly R[],
+    ReturnedState extends unknown
   >(
     fetchFunc: (
       set: typeof update,
@@ -172,17 +173,20 @@ const createStore = <GlobalState extends object = {}>(
       waitFor,
       token,
       allow,
+      data,
     }: {
       waitFor?: FuncParams;
       token?: LockToken;
       allow?: (isInitialCall: boolean) => boolean;
+      data?: (s: GlobalState) => R;
     } = {}
   ) => {
     let _token: LockToken = useMemo(() => token ?? Symbol(), [token]);
     const _waitFor: FuncParams | [] = waitFor || [];
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
-    const { isFetching, setIsFetching } = useLockData(_token);
+    const { isFetching, setIsFetching } = useLockMetadata(_token);
+    const [stateData] = useStore(data ?? (() => undefined));
 
     useEffect(() => {
       waitForDeps.current = _waitFor;
@@ -239,7 +243,11 @@ const createStore = <GlobalState extends object = {}>(
       refreshFuncRef.current(true);
     }, [refreshFuncRef, ...(waitFor || [])]);
 
-    return { refresh: () => refreshFuncRef.current(false), isFetching };
+    return {
+      refresh: () => refreshFuncRef.current(false),
+      isFetching,
+      data: stateData,
+    };
   };
 
   return { useStore, getSnapshot, update, useFetchData };
