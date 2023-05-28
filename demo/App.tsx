@@ -27,7 +27,7 @@ export function App() {
     return () => clearTimeout(t);
   });
 
-  const refresh = useFetchData(
+  const { refresh, isFetching } = useFetchData(
     (set, ...functionParams) => {
       return promiseTimeout(() => {
         const sampleValue = functionParams[0];
@@ -46,7 +46,7 @@ export function App() {
         set({
           bar: `The current time is  ${new Date().toLocaleTimeString()} `,
         });
-      }, 1500);
+      }, 1000);
     },
     {
       token: "UNIQUE_TOKEN",
@@ -69,6 +69,14 @@ export function App() {
     <>
       <div>Foo is currently {foo ? "true" : "false"}</div>
       <p>Bar = "{bar}"</p>
+      <p>
+        <code>isFetching = {JSON.stringify(isFetching)}</code>
+      </p>
+      <p style={{ background: "yellow" }}>
+        isFetching is true all the time because either it is in the "fetch" mode
+        or if not it will trigger the "fetch" mode in this demo. So don't expect
+        this demo to become "isFetching = false" at any point.
+      </p>
     </>
   );
 }

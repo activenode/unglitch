@@ -13,6 +13,7 @@ type LockToken = symbol | string;
 type TokenData = {
   isFetching: boolean;
 };
+type TokenDataContainer = { [key: LockToken]: TokenData };
 
 const nonNullOrUndefined = (i: any) => i !== null && i !== undefined;
 
@@ -25,7 +26,7 @@ const createStore = <GlobalState extends object = {}>(
   type PartialStateReturner = (state: GlobalState) => PartialState;
 
   let state: GlobalState = {
-    [UNIQUE_STORE_SYMBOL]: {} as { [key: LockToken]: TokenData },
+    [UNIQUE_STORE_SYMBOL]: {} as TokenDataContainer,
     ...initialState(),
   };
 
@@ -40,7 +41,10 @@ const createStore = <GlobalState extends object = {}>(
     listeners.forEach((fn) => fn());
   };
 
-  const update = (updater: PartialStateReturner | PartialState) => {
+  const update = (
+    updater: PartialStateReturner | PartialState,
+    forceUpdate = false
+  ) => {
     let partialState: PartialState = {};
 
     switch (typeof updater) {
@@ -62,10 +66,14 @@ const createStore = <GlobalState extends object = {}>(
 
     // todo: make a check if it is really still perfing well
     // with huge objects that differ in a deep deep set only
-    if (!equal(state, newState)) {
+    if (forceUpdate || !equal(state, newState)) {
       state = newState;
       triggerSubscribers();
     }
+  };
+
+  const forceUpdate: typeof update = (updater) => {
+    update(updater, true);
   };
 
   /**
@@ -120,21 +128,23 @@ const createStore = <GlobalState extends object = {}>(
 
   const useLockData = (token: LockToken) => {
     const [{ isFetching }] = useStore((s) => {
-      const tokenData = (s as any)[UNIQUE_STORE_SYMBOL] as TokenData;
-
-      return tokenData;
+      return {
+        isFetching: ((s as any)?.[UNIQUE_STORE_SYMBOL] as TokenDataContainer)?.[
+          token
+        ]?.isFetching,
+      };
     });
 
     const setIsFetching = (isFetching: boolean) => {
-      update((s) => {
+      forceUpdate((s) => {
         return {
+          ...s,
           [UNIQUE_STORE_SYMBOL]: {
-            ...(s as any)[UNIQUE_STORE_SYMBOL],
+            ...((s as any)?.[UNIQUE_STORE_SYMBOL] as TokenDataContainer),
             [token]: {
               isFetching,
             },
           },
-          ...s,
         };
       });
     };
