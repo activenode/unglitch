@@ -178,7 +178,7 @@ const createStore = <GlobalState extends object = {}>(
       waitFor?: FuncParams;
       token?: LockToken;
       allow?: (isInitialCall: boolean) => boolean;
-      data?: (s: GlobalState) => R;
+      data?: (s: GlobalState, isFetching?: boolean) => R;
     } = {}
   ) => {
     let _token: LockToken = useMemo(() => token ?? Symbol(), [token]);
@@ -186,7 +186,9 @@ const createStore = <GlobalState extends object = {}>(
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
     const { isFetching, setIsFetching } = useLockMetadata(_token);
-    const [stateData] = useStore(data ?? (() => undefined));
+    const [stateData] = useStore(
+      data ? (s) => data(s, isFetching) : () => undefined
+    );
 
     useEffect(() => {
       waitForDeps.current = _waitFor;
