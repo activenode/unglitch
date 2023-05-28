@@ -1,18 +1,34 @@
 import equal from "fast-deep-equal";
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 type UnlockFn = () => boolean;
-type LockToken = Symbol | string;
+type LockToken = symbol | string;
+type TokenData = {
+  isFetching: boolean;
+};
 
 const nonNullOrUndefined = (i: any) => i !== null && i !== undefined;
 
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
 ) => {
+  const UNIQUE_STORE_SYMBOL = Symbol();
+
   type PartialState = Partial<GlobalState>;
   type PartialStateReturner = (state: GlobalState) => PartialState;
 
-  let state: GlobalState = initialState();
+  let state: GlobalState = {
+    [UNIQUE_STORE_SYMBOL]: {} as { [key: LockToken]: TokenData },
+    ...initialState(),
+  };
+
   const locks = new Map<LockToken, boolean>();
   const getSnapshot = () => state;
 
@@ -102,6 +118,30 @@ const createStore = <GlobalState extends object = {}>(
     return [reduceStateToLocalState(), getRealtimeLocalState] as const;
   };
 
+  const useLockData = (token: LockToken) => {
+    const [{ isFetching }] = useStore((s) => {
+      const tokenData = (s as any)[UNIQUE_STORE_SYMBOL] as TokenData;
+
+      return tokenData;
+    });
+
+    const setIsFetching = (isFetching: boolean) => {
+      update((s) => {
+        return {
+          [UNIQUE_STORE_SYMBOL]: {
+            ...(s as any)[UNIQUE_STORE_SYMBOL],
+            [token]: {
+              isFetching,
+            },
+          },
+          ...s,
+        };
+      });
+    };
+
+    return { isFetching, setIsFetching } as const;
+  };
+
   /**
    * This function will lock the provided function to be only called once
    * per point of time. It can only be called another time when the previous
@@ -128,10 +168,11 @@ const createStore = <GlobalState extends object = {}>(
       allow?: (isInitialCall: boolean) => boolean;
     } = {}
   ) => {
-    let _token: LockToken = token ?? Symbol();
+    let _token: LockToken = useMemo(() => token ?? Symbol(), [token]);
     const _waitFor: FuncParams | [] = waitFor || [];
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
+    const { isFetching, setIsFetching } = useLockData(_token);
 
     useEffect(() => {
       waitForDeps.current = _waitFor;
@@ -150,10 +191,15 @@ const createStore = <GlobalState extends object = {}>(
         const unlocker = getLock(_token as LockToken);
 
         if (unlocker) {
+          setIsFetching(true);
+
           // then and ONLY then the lock is currently free!
           // console.log("[Debug]: Lock is free, call it ; Token =", token);
           fetchFunc(update, ...(waitForDeps.current as FuncParams)).finally(
-            unlocker
+            () => {
+              unlocker();
+              setIsFetching(false);
+            }
           ); // when it's done, we unlock
         }
       },
@@ -183,7 +229,7 @@ const createStore = <GlobalState extends object = {}>(
       refreshFuncRef.current(true);
     }, [refreshFuncRef, ...(waitFor || [])]);
 
-    return () => refresh(false);
+    return { refresh: () => refreshFuncRef.current(false), isFetching };
   };
 
   return { useStore, getSnapshot, update, useFetchData };
