@@ -1,6 +1,7 @@
 # _Unglitch_ - another store?
 
-<img src="./logo.jpg" width="350px" alt="" />
+<img src="./logo.jpg" width="400px" 
+style="max-width: 100%" alt="" />
 
 Yes. React 18+ only and not planning to port to anything else. Get your sh\*t up-to-date. No Context Provider needed, hooks only.
 
