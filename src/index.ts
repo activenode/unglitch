@@ -181,7 +181,7 @@ const createStore = <GlobalState extends object = {}>(
     }: {
       waitFor?: FuncParams;
       token?: LockToken;
-      allow?: (isInitialCall: boolean) => boolean | "data-empty";
+      allow?: ((isInitialCall: boolean) => boolean) | "if-empty";
       data?: (s: GlobalState, isFetching?: boolean) => ReturnedState;
     } = {}
   ) => {
@@ -209,7 +209,7 @@ const createStore = <GlobalState extends object = {}>(
             if (!allow(isInitialCall)) {
               return; // not allowed to execute
             }
-          } else if (allow === "data-empty") {
+          } else if (allow === "if-empty") {
             const realtimeData = realtimeStateData();
 
             if (realtimeData !== null && realtimeData !== undefined) {
