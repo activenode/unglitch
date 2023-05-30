@@ -128,10 +128,14 @@ const createStore = <GlobalState extends object = {}>(
 
   const useLockMetadata = (token: LockToken) => {
     const [{ isFetching }] = useStore((s) => {
+      const tokenDataContainer = (s as any)?.[
+        UNIQUE_STORE_SYMBOL
+      ] as TokenDataContainer;
+
+      const tokenData = tokenDataContainer?.[token];
+
       return {
-        isFetching: ((s as any)?.[UNIQUE_STORE_SYMBOL] as TokenDataContainer)?.[
-          token
-        ]?.isFetching,
+        isFetching: tokenData?.isFetching,
       };
     });
 
@@ -178,7 +182,7 @@ const createStore = <GlobalState extends object = {}>(
       waitFor?: FuncParams;
       token?: LockToken;
       allow?: (isInitialCall: boolean) => boolean;
-      data?: (s: GlobalState, isFetching?: boolean) => R;
+      data?: (s: GlobalState, isFetching?: boolean) => ReturnedState;
     } = {}
   ) => {
     let _token: LockToken = useMemo(() => token ?? Symbol(), [token]);
