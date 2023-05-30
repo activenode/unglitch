@@ -181,7 +181,7 @@ const createStore = <GlobalState extends object = {}>(
     }: {
       waitFor?: FuncParams;
       token?: LockToken;
-      allow?: (isInitialCall: boolean) => boolean;
+      allow?: (isInitialCall: boolean) => boolean | "data-empty";
       data?: (s: GlobalState, isFetching?: boolean) => ReturnedState;
     } = {}
   ) => {
@@ -190,7 +190,7 @@ const createStore = <GlobalState extends object = {}>(
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
     const { isFetching, setIsFetching } = useLockMetadata(_token);
-    const [stateData] = useStore(
+    const [stateData, realtimeStateData] = useStore(
       data ? (s) => data(s, isFetching) : () => undefined
     );
 
@@ -204,8 +204,18 @@ const createStore = <GlobalState extends object = {}>(
           return;
         }
 
-        if (allow && !allow(isInitialCall)) {
-          return; // not allowed to execute
+        if (allow) {
+          if (typeof allow === "function") {
+            if (!allow(isInitialCall)) {
+              return; // not allowed to execute
+            }
+          } else if (allow === "data-empty") {
+            const realtimeData = realtimeStateData();
+
+            if (realtimeData !== null && realtimeData !== undefined) {
+              return; // not allowed to execute
+            }
+          }
         }
 
         const unlocker = getLock(_token as LockToken);
