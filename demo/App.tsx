@@ -46,7 +46,7 @@ export function App() {
         set({
           bar: `The current time is  ${new Date().toLocaleTimeString()} `,
         });
-      }, 1000);
+      }, 200);
     },
     {
       token: "UNIQUE_TOKEN",
@@ -54,19 +54,20 @@ export function App() {
       data(s) {
         return s.bar;
       },
+      refreshInterval: 5000,
     }
   );
 
   console.log({ waitSampleValue, dataThatUseFetchDataReturns: data });
 
-  useEffect(() => {
-    const i = setInterval(() => {
-      refresh();
-    }, 20);
-    // this is not clever but its super-safe as the fetching will only be called
-    // when the previous one is released
-    return () => window.clearInterval(i);
-  }, []);
+  // useEffect(() => {
+  //   const i = setInterval(() => {
+  //     refresh();
+  //   }, 20);
+  //   // this is not clever but its super-safe as the fetching will only be called
+  //   // when the previous one is released
+  //   return () => window.clearInterval(i);
+  // }, []);
 
   return (
     <>

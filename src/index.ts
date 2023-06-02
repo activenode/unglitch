@@ -12,6 +12,7 @@ type UnlockFn = () => boolean;
 type LockToken = symbol | string;
 type TokenData = {
   isFetching: boolean;
+  lastFetchAt: number;
 };
 type TokenDataContainer = { [key: LockToken]: TokenData };
 
@@ -20,8 +21,11 @@ const nonNullOrUndefined = (i: any) => i !== null && i !== undefined;
 const createStore = <GlobalState extends object = {}>(
   initialState: () => GlobalState
 ) => {
-  const UNIQUE_STORE_SYMBOL = Symbol();
+  const UNIQUE_STORE_SYMBOL: unique symbol = Symbol();
 
+  type InternalState = GlobalState & {
+    [UNIQUE_STORE_SYMBOL]: TokenDataContainer;
+  };
   type PartialState = Partial<GlobalState>;
   type PartialStateReturner = (state: GlobalState) => PartialState;
 
@@ -43,7 +47,7 @@ const createStore = <GlobalState extends object = {}>(
 
   const update = (
     updater: PartialStateReturner | PartialState,
-    forceUpdate = false
+    { forceUpdate = false }: { forceUpdate?: boolean } = {}
   ) => {
     let partialState: PartialState = {};
 
@@ -73,7 +77,7 @@ const createStore = <GlobalState extends object = {}>(
   };
 
   const forceUpdate: typeof update = (updater) => {
-    update(updater, true);
+    update(updater, { forceUpdate: true });
   };
 
   /**
@@ -126,9 +130,16 @@ const createStore = <GlobalState extends object = {}>(
     return [reduceStateToLocalState(), getRealtimeLocalState] as const;
   };
 
+  const getImmediateLockMetadata = (token: LockToken) => {
+    const tokenDataContainer = (state as InternalState)[
+      UNIQUE_STORE_SYMBOL
+    ] as TokenDataContainer;
+    return tokenDataContainer?.[token];
+  };
+
   const useLockMetadata = (token: LockToken) => {
-    const [{ isFetching }] = useStore((s) => {
-      const tokenDataContainer = (s as any)?.[
+    const [{ isFetching, lastFetchAt }] = useStore((s) => {
+      const tokenDataContainer = (s as InternalState)?.[
         UNIQUE_STORE_SYMBOL
       ] as TokenDataContainer;
 
@@ -136,24 +147,33 @@ const createStore = <GlobalState extends object = {}>(
 
       return {
         isFetching: tokenData?.isFetching,
+        lastFetchAt: tokenData?.lastFetchAt,
       };
     });
 
-    const setIsFetching = (isFetching: boolean) => {
+    const updateTokenMetadata = (metadata: Partial<TokenData>) => {
       forceUpdate((s) => {
         return {
-          ...s,
           [UNIQUE_STORE_SYMBOL]: {
             ...((s as any)?.[UNIQUE_STORE_SYMBOL] as TokenDataContainer),
             [token]: {
-              isFetching,
+              ...((s as any)?.[UNIQUE_STORE_SYMBOL]?.[token] as TokenData),
+              ...metadata,
             },
           },
-        };
+        } as any as PartialState;
       });
     };
 
-    return { isFetching, setIsFetching } as const;
+    const setIsFetching = (isFetching: boolean) => {
+      updateTokenMetadata({ isFetching });
+    };
+
+    const setLastFetchAt = (lastFetchAt: number) => {
+      updateTokenMetadata({ lastFetchAt });
+    };
+
+    return { isFetching, setIsFetching, lastFetchAt, setLastFetchAt } as const;
   };
 
   /**
@@ -178,20 +198,26 @@ const createStore = <GlobalState extends object = {}>(
       token,
       allow,
       data,
+      refreshInterval,
     }: {
       waitFor?: FuncParams;
       token?: LockToken;
       allow?: ((isInitialCall: boolean) => boolean) | "if-empty";
       data?: (s: GlobalState, isFetching?: boolean) => ReturnedState;
+      refreshInterval?: number;
     } = {}
   ) => {
     let _token: LockToken = useMemo(() => token ?? Symbol(), [token]);
     const _waitFor: FuncParams | [] = waitFor || [];
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
-    const { isFetching, setIsFetching } = useLockMetadata(_token);
+    const { isFetching, setIsFetching, lastFetchAt, setLastFetchAt } =
+      useLockMetadata(_token);
     const [stateData, realtimeStateData] = useStore(
       data ? (s) => data(s, isFetching) : () => undefined
+    );
+    const refreshFuncRef = useRef<(isInitialCall: boolean) => boolean>(
+      () => false
     );
 
     useEffect(() => {
@@ -200,20 +226,35 @@ const createStore = <GlobalState extends object = {}>(
 
     const refresh = useCallback(
       (isInitialCall = false) => {
+        // 1. check deps
         if (!waitForDeps.current.every(nonNullOrUndefined)) {
-          return;
+          return false;
+        }
+
+        // 2. check if still needs to wait (min wait time)
+        if (refreshInterval) {
+          const tokenData = getImmediateLockMetadata(_token as LockToken);
+
+          if (tokenData?.lastFetchAt) {
+            const now = Date.now();
+            const diff = now - tokenData.lastFetchAt;
+
+            if (diff < refreshInterval) {
+              return false; // not allowed to execute
+            }
+          }
         }
 
         if (allow) {
           if (typeof allow === "function") {
             if (!allow(isInitialCall)) {
-              return; // not allowed to execute
+              return false; // not allowed to execute
             }
           } else if (allow === "if-empty") {
             const realtimeData = realtimeStateData();
 
             if (realtimeData !== null && realtimeData !== undefined) {
-              return; // not allowed to execute
+              return false; // not allowed to execute
             }
           }
         }
@@ -222,6 +263,7 @@ const createStore = <GlobalState extends object = {}>(
 
         if (unlocker) {
           setIsFetching(true);
+          setLastFetchAt(Date.now());
 
           // then and ONLY then the lock is currently free!
           // console.log("[Debug]: Lock is free, call it ; Token =", token);
@@ -231,16 +273,34 @@ const createStore = <GlobalState extends object = {}>(
               setIsFetching(false);
             }
           ); // when it's done, we unlock
+
+          return true;
         }
+
+        return false;
       },
       [fetchFunc, allow]
     );
 
-    const refreshFuncRef = useRef<(isInitialCall: boolean) => void>(refresh);
-
     useEffect(() => {
       refreshFuncRef.current = refresh;
     }, [refresh]);
+
+    useEffect(() => {
+      let interval: number;
+
+      if (refreshInterval) {
+        interval = setInterval(() => {
+          refreshFuncRef.current(false);
+        }, refreshInterval);
+      }
+
+      return () => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      };
+    }, [refreshInterval]);
 
     useEffect(() => {
       if (!waitForDeps.current.every(nonNullOrUndefined)) {
@@ -263,6 +323,7 @@ const createStore = <GlobalState extends object = {}>(
       refresh: () => refreshFuncRef.current(false),
       isFetching,
       data: stateData,
+      lastFetchAt,
     };
   };
 
