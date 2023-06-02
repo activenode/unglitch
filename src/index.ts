@@ -1,10 +1,9 @@
-import equal from "fast-deep-equal";
+import { deepEqual as equal } from "fast-equals";
 import {
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
   useSyncExternalStore,
 } from "react";
 
@@ -13,6 +12,7 @@ type LockToken = symbol | string;
 type TokenData = {
   isFetching: boolean;
   lastFetchAt: number;
+  lastFetchError: null | any;
 };
 type TokenDataContainer = { [key: LockToken]: TokenData };
 
@@ -148,6 +148,7 @@ const createStore = <GlobalState extends object = {}>(
       return {
         isFetching: tokenData?.isFetching,
         lastFetchAt: tokenData?.lastFetchAt,
+        lastFetchError: tokenData?.lastFetchError,
       };
     });
 
@@ -173,7 +174,17 @@ const createStore = <GlobalState extends object = {}>(
       updateTokenMetadata({ lastFetchAt });
     };
 
-    return { isFetching, setIsFetching, lastFetchAt, setLastFetchAt } as const;
+    const setLastFetchError = (error: null | any) => {
+      updateTokenMetadata({ lastFetchError: error });
+    };
+
+    return {
+      isFetching,
+      setIsFetching,
+      lastFetchAt,
+      setLastFetchAt,
+      setLastFetchError,
+    } as const;
   };
 
   /**
@@ -198,12 +209,14 @@ const createStore = <GlobalState extends object = {}>(
       token,
       allow,
       data,
+      onSuccess,
       refreshInterval,
     }: {
       waitFor?: FuncParams;
       token?: LockToken;
       allow?: ((isInitialCall: boolean) => boolean) | "if-empty";
       data?: (s: GlobalState, isFetching?: boolean) => ReturnedState;
+      onSuccess?: (set: typeof update, data: T) => void;
       refreshInterval?: number;
     } = {}
   ) => {
@@ -211,8 +224,13 @@ const createStore = <GlobalState extends object = {}>(
     const _waitFor: FuncParams | [] = waitFor || [];
     const waitForDeps = useRef<FuncParams | readonly []>(_waitFor);
     const hadInitialCallRef = useRef(false);
-    const { isFetching, setIsFetching, lastFetchAt, setLastFetchAt } =
-      useLockMetadata(_token);
+    const {
+      isFetching,
+      setIsFetching,
+      lastFetchAt,
+      setLastFetchAt,
+      setLastFetchError,
+    } = useLockMetadata(_token);
     const [stateData, realtimeStateData] = useStore(
       data ? (s) => data(s, isFetching) : () => undefined
     );
@@ -267,12 +285,20 @@ const createStore = <GlobalState extends object = {}>(
 
           // then and ONLY then the lock is currently free!
           // console.log("[Debug]: Lock is free, call it ; Token =", token);
-          fetchFunc(update, ...(waitForDeps.current as FuncParams)).finally(
-            () => {
+          fetchFunc(update, ...(waitForDeps.current as FuncParams))
+            .then((value) => {
+              setLastFetchError(undefined);
+              onSuccess?.(update, value);
+              return value;
+            })
+            .catch((e) => {
+              console.error(e);
+              setLastFetchError(e);
+            })
+            .finally(() => {
               unlocker();
               setIsFetching(false);
-            }
-          ); // when it's done, we unlock
+            }); // when it's done, we unlock
 
           return true;
         }

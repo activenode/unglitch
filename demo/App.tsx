@@ -43,16 +43,19 @@ export function App() {
         // const realtimeState = getRealtimeState();
         // const [, beforeBar] = realtimeState;
 
-        set({
-          bar: `The current time is  ${new Date().toLocaleTimeString()} `,
-        });
-      }, 200);
+        return `The current time is  ${new Date().toLocaleTimeString()}`;
+      }, 200) as Promise<string>;
     },
     {
       token: "UNIQUE_TOKEN",
       waitFor: [waitSampleValue, false, "keks"] as const,
       data(s) {
         return s.bar;
+      },
+      onSuccess(update, value) {
+        update({
+          bar: value,
+        });
       },
       refreshInterval: 5000,
     }
