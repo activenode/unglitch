@@ -29,9 +29,9 @@
   "author": "David Lorenz <info@activenode.de>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/activenode/glitch/issues"
+    "url": "https://github.com/activenode/unglitch/issues"
   },
-  "homepage": "https://github.com/activenode/glitch#readme",
+  "homepage": "https://github.com/activenode/unglitch#readme",
   "peerDependencies": {
     "react": "^18.2.0"
   },
