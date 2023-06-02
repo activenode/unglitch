@@ -1,5 +1,7 @@
 # _Unglitch_ - another store?
 
+**This library has 985 bytes (compressed with `brotli` which every browser supports).**
+
 <img src="./logo.jpg" width="400px" 
 style="max-width: 100%" alt="" />
 
