@@ -45,9 +45,17 @@ const createStore = <GlobalState extends object = {}>(
     listeners.forEach((fn) => fn());
   };
 
-  const update = (
+  interface updateFn {
+    (
+      updater: PartialStateReturner,
+      options?: { forceUpdate?: boolean; merge?: boolean }
+    ): void;
+    merge: (updater: PartialStateReturner) => void;
+  }
+
+  let update: updateFn = ((
     updater: PartialStateReturner | PartialState,
-    { forceUpdate = false }: { forceUpdate?: boolean } = {}
+    { forceUpdate = false, merge = false } = {}
   ) => {
     let partialState: PartialState = {};
 
@@ -63,10 +71,32 @@ const createStore = <GlobalState extends object = {}>(
     // const partialState = fn(state);
 
     // maybe even do a better merge here, but should be fine for now
-    const newState = {
-      ...state,
-      ...partialState,
-    };
+    let newState: GlobalState & PartialState;
+
+    if (!merge) {
+      newState = { ...state, ...partialState };
+    } else {
+      // merge the partial state keys (one level down)
+      newState = { ...state };
+
+      const partialStateKeys = Object.keys(
+        partialState
+      ) as (keyof PartialState)[];
+
+      for (const key of partialStateKeys) {
+        if (nonNullOrUndefined(partialState[key])) {
+          const existingData = newState[key];
+
+          if (typeof existingData === "object") {
+            // spread
+            newState[key] = { ...existingData, ...partialState[key] };
+          } else {
+            // set
+            newState[key] = partialState[key]!;
+          }
+        }
+      }
+    }
 
     // todo: make a check if it is really still perfing well
     // with huge objects that differ in a deep deep set only
@@ -74,9 +104,13 @@ const createStore = <GlobalState extends object = {}>(
       state = newState;
       triggerSubscribers();
     }
+  }) as updateFn;
+
+  update.merge = (updater: PartialStateReturner) => {
+    update(updater, { merge: true });
   };
 
-  const forceUpdate: typeof update = (updater) => {
+  const forceUpdate = (updater: Parameters<typeof update>[0]) => {
     update(updater, { forceUpdate: true });
   };
 

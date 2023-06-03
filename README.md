@@ -1,7 +1,7 @@
 # _Unglitch_ - another store?
 
 **This library has 985 bytes itself (compressed with `brotli` which every browser supports).
-Adding up its single dependency `fast-equals` it comes down to less than 3kb**
+Adding up its single dependency `fast-equals` it comes down to less than 2.8kb**
 
 <img src="./logo.jpg" width="400px" 
 style="max-width: 100%" alt="" />
