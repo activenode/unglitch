@@ -84,12 +84,25 @@ const createStore = <GlobalState extends object = {}>(
       ) as (keyof PartialState)[];
 
       for (const key of partialStateKeys) {
-        if (nonNullOrUndefined(partialState[key])) {
+        const partialStateValue = partialState[key];
+        if (nonNullOrUndefined(partialStateValue)) {
           const existingData = newState[key];
 
           if (typeof existingData === "object") {
             // spread
-            newState[key] = { ...existingData, ...partialState[key] };
+
+            if (
+              Array.isArray(existingData) &&
+              Array.isArray(partialStateValue)
+            ) {
+              // array
+              newState[key] = [
+                ...existingData,
+                ...partialStateValue,
+              ] as GlobalState[typeof key];
+            } else {
+              newState[key] = { ...existingData, ...partialState[key] };
+            }
           } else {
             // set
             newState[key] = partialState[key]!;
