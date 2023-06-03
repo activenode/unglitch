@@ -47,7 +47,7 @@ const createStore = <GlobalState extends object = {}>(
 
   interface updateFn {
     (
-      updater: PartialStateReturner,
+      updater: PartialStateReturner | PartialState,
       options?: { forceUpdate?: boolean; merge?: boolean }
     ): void;
     merge: (updater: PartialStateReturner) => void;
