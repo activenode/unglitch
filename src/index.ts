@@ -45,13 +45,13 @@ const createStore = <GlobalState extends object = {}>(
     listeners.forEach((fn) => fn());
   };
 
-  interface updateFn {
+  type updateFn = {
     (
       updater: PartialStateReturner | PartialState,
       options?: { forceUpdate?: boolean; merge?: boolean }
     ): void;
     merge: (updater: PartialStateReturner) => void;
-  }
+  };
 
   let update: updateFn = ((
     updater: PartialStateReturner | PartialState,
