@@ -42,22 +42,13 @@ export default function App() {
 ---
 
 <Layout title="unglitch - THE state manager.">
-  <header class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+  <header class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-26">
     <div
-      class="absolute inset-0 -z-10 h-full w-full blur-xl opacity-50"
-      style="background-image: url('/public/unglitch-tile.png'); background-size: 100% 100%;"
+      class="absolute inset-0 -z-10 h-full w-full blur-xl opacity-60"
+      style="background-image: url('/public/unglitch-tile.png'); background-size: 100%"
     >
     </div>
-    <div
-      class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
-      aria-hidden="true"
-    >
-      <div
-        class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
-        style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
-      >
-      </div>
-    </div>
+
     <div
       class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
       aria-hidden="true"
@@ -94,7 +85,7 @@ export default function App() {
               from anywhere in your App
             </dt>
             <dd class="text-2xl font-bold leading-9 tracking-tight text-white">
-              Simple <code class="alt">update</code>
+              Simple <code class="line alt">update</code>
             </dd>
           </div>
           <div class="flex flex-col-reverse">
@@ -110,14 +101,15 @@ export default function App() {
 
   <main class="max-w-5xl mx-auto px-6">
     <div class="max-w-5xl mx-auto">
-      <p class="text-white text-3xl text-center">
+      <p class="text-white text-3xl text-center mt-12">
         This library <strong>can</strong> be used without TypeScript, but all the
-        sample code in here is written in TypeScript. And why not? It's 2023.
+        sample code in here is written in TypeScript.
+        <span class="text-indigo-200">And why not? It's 2023.</span>
       </p>
 
       <div class="flex justify-center mb-12 mt-12">
         <div class="npmi">
-          <code class="text-4xl">npm i unglitch@latest</code>
+          <code class="line">npm i unglitch@latest</code>
         </div>
       </div>
     </div>
@@ -159,7 +151,7 @@ export default function App() {
   mark::before {
     content: "";
     position: absolute;
-    left: 3px;
+    left: 0;
     width: 100%;
     height: 1.4em;
     top: 0.17em;
@@ -200,25 +192,34 @@ export default function App() {
     padding: 1rem;
     border-radius: 0.4rem;
   }
-  code {
+  code.line {
     font-size: 0.875em;
     font-weight: bold;
     background: rgba(var(--accent), 12%);
     color: rgb(var(--accent));
     border-radius: 4px;
     padding: 0.3em 0.45em;
+    display: inline-block;
   }
 
   code.alt {
     color: var(--accent-light);
+    border: 1px solid rgba(var(--accent), 25%);
+    line-height: 1.1em;
   }
 
   .npmi {
-    @apply p-4 bg-gray-100;
+    @apply p-4  rounded-lg border-2 border-fuchsia-600 border-opacity-25;
+    background: linear-gradient(
+      to right,
+      #0f0c296a,
+      #302b639f,
+      #38243e
+    ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   }
 
   .npmi code {
-    @apply p-0 font-extrabold text-transparent text-2xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600;
+    @apply p-0 px-3 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600;
   }
 
   .instructions strong {
