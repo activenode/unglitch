@@ -153,19 +153,20 @@ export default function App() {
   }
 
   mark {
-    @apply px-3 inline-block transition-transform rounded relative bg-transparent;
+    @apply mx-2 inline-block transition-transform rounded relative bg-transparent text-white;
   }
 
   mark::before {
     content: "";
     position: absolute;
-    left: 0;
+    left: 3px;
     width: 100%;
     height: 1.4em;
     top: 0.17em;
     z-index: -1;
-    border-radius: 0.5rem;
-    background-color: yellow;
+    /* border-radius: 0.5rem; */
+    /* background-color: yellow; */
+    border-bottom: 1px solid yellow;
   }
 
   mark.alt {
