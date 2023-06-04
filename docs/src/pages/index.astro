@@ -4,6 +4,8 @@ import Card from "../components/Card.astro";
 import "highlight.js/styles/github.css";
 
 const createStoreSample = `
+import { create } from "unglitch";
+
 type MyStore = {
   todos: string[];
 };
@@ -74,7 +76,7 @@ export default function App() {
         <p class="mt-6 text-2xl text-gray-300 leading-10">
           React v18+ since it is using the official <a
             href="https://react.dev/reference/react/useSyncExternalStore"
-            ><mark class="alt">Store API.</mark></a
+            ><mark>Store API.</mark></a
           >
           <br /> If you like
           <a href="https://github.com/pmndrs/zustand"><mark>zustand</mark></a>
@@ -92,7 +94,7 @@ export default function App() {
               from anywhere in your App
             </dt>
             <dd class="text-2xl font-bold leading-9 tracking-tight text-white">
-              Simple <code>updates</code>
+              Simple <code class="alt">update</code>
             </dd>
           </div>
           <div class="flex flex-col-reverse">
@@ -108,17 +110,19 @@ export default function App() {
 
   <main class="max-w-5xl mx-auto px-6">
     <div class="max-w-5xl mx-auto">
-      <p class="text-white text-2xl">
+      <p class="text-white text-3xl text-center">
         This library <strong>can</strong> be used without TypeScript, but all the
-        sample code in here is written in TypeScript.
+        sample code in here is written in TypeScript. And why not? It's 2023.
       </p>
-      <p class="instructions">
-        Nothing is easier than using this library.
-        <code>npm i unglitch@latest</code>
-      </p>
+
+      <div class="flex justify-center mb-12 mt-12">
+        <div class="npmi">
+          <code class="text-4xl">npm i unglitch@latest</code>
+        </div>
+      </div>
     </div>
 
-    <ul role="list" class="link-card-grid max-w-[600px] flex flex-col gap-2">
+    <ul role="list" class="link-card-grid flex flex-col gap-2">
       <Card
         title="Step 1: Create a Store"
         lang="typescript"
@@ -186,13 +190,7 @@ export default function App() {
     font-weight: 800;
     margin: 0;
   }
-  .text-gradient {
-    background-image: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 400%;
-    background-position: 0%;
-  }
+
   .instructions {
     line-height: 1.6;
     margin: 1rem 0;
@@ -201,7 +199,7 @@ export default function App() {
     padding: 1rem;
     border-radius: 0.4rem;
   }
-  .instructions code {
+  code {
     font-size: 0.875em;
     font-weight: bold;
     background: rgba(var(--accent), 12%);
@@ -209,6 +207,19 @@ export default function App() {
     border-radius: 4px;
     padding: 0.3em 0.45em;
   }
+
+  code.alt {
+    color: var(--accent-light);
+  }
+
+  .npmi {
+    @apply p-4 bg-gray-100;
+  }
+
+  .npmi code {
+    @apply p-0 font-extrabold text-transparent text-2xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600;
+  }
+
   .instructions strong {
     color: rgb(var(--accent));
   }
