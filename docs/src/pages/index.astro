@@ -1,0 +1,215 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
+import "highlight.js/styles/github.css";
+
+const createStoreSample = `
+type MyStore = {
+  todos: string[];
+};
+
+const store = create({
+  todos: []
+});
+
+export const { 
+  useStore, 
+  useFetchData, 
+  getSnapshot, 
+  update 
+} = store;
+`.trim();
+
+const useStoreSample = `
+import { useStore } from "./utils/store";
+
+export default function App() {
+  const [ todos ] = useStore(
+    state => state.todos
+  );
+
+  return (
+    <ul>
+      {todos.map((todo) => (
+        <li>{todo}</li>
+      ))}
+    </ul>
+  );
+}
+`.trim();
+---
+
+<Layout title="unglitch - THE state manager.">
+  <header class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+    <div
+      class="absolute inset-0 -z-10 h-full w-full blur-xl opacity-50"
+      style="background-image: url('/public/unglitch-tile.png'); background-size: 100% 100%;"
+    >
+    </div>
+    <div
+      class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
+      aria-hidden="true"
+    >
+      <div
+        class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
+        style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
+      >
+      </div>
+    </div>
+    <div
+      class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
+      aria-hidden="true"
+    >
+      <div
+        class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
+        style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
+      >
+      </div>
+    </div>
+    <div class="mx-auto max-w-5xl px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl lg:mx-0">
+        <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+          State Management + Caching for everyone.
+        </h2>
+        <p class="mt-6 text-2xl text-gray-300 leading-10">
+          React v18+ since it is using the official <a
+            href="https://react.dev/reference/react/useSyncExternalStore"
+            ><mark class="alt">Store API.</mark></a
+          >
+          <br /> If you like
+          <a href="https://github.com/pmndrs/zustand"><mark>zustand</mark></a>
+          and <a href="https://github.com/pmndrs/zustand"
+            ><mark>react-query</mark></a
+          > you will love this.
+        </p>
+      </div>
+      <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+        <dl
+          class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <div class="flex flex-col-reverse">
+            <dt class="text-base leading-7 text-gray-300">
+              from anywhere in your App
+            </dt>
+            <dd class="text-2xl font-bold leading-9 tracking-tight text-white">
+              Simple <code>updates</code>
+            </dd>
+          </div>
+          <div class="flex flex-col-reverse">
+            <dt class="text-base leading-7 text-gray-300">Really.</dt>
+            <dd class="text-2xl font-bold leading-9 tracking-tight text-white">
+              less than 3kb
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-white text-2xl">
+        This library <strong>can</strong> be used without TypeScript, but all the
+        sample code in here is written in TypeScript.
+      </p>
+      <p class="instructions">
+        Nothing is easier than using this library.
+        <code>npm i unglitch@latest</code>
+      </p>
+    </div>
+
+    <ul role="list" class="link-card-grid max-w-[600px] flex flex-col gap-2">
+      <Card
+        title="Step 1: Create a Store"
+        lang="typescript"
+        file="your_app/utils/store.ts"
+      >
+        {createStoreSample}
+      </Card>
+      <Card
+        title="Step 2: Use the Store"
+        lang="typescript"
+        file="your_app/App.tsx"
+      >
+        {useStoreSample}
+      </Card>
+    </ul>
+  </main>
+</Layout>
+
+<script>
+  import hljs from "highlight.js";
+
+  hljs.highlightAll();
+</script>
+
+<style>
+  .card-code {
+    @apply mt-2;
+  }
+
+  mark {
+    @apply px-3 inline-block transition-transform rounded relative bg-transparent;
+  }
+
+  mark::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.4em;
+    top: 0.17em;
+    z-index: -1;
+    border-radius: 0.5rem;
+    background-color: yellow;
+  }
+
+  mark.alt {
+    @apply text-white;
+  }
+
+  mark.alt::before {
+    @apply bg-gradient-to-r from-[#ff4694] to-[#776fff];
+  }
+
+  a:hover > mark {
+    transform: scale(1.06);
+  }
+
+  main {
+    margin: auto;
+    padding: 1.5rem 0;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+  }
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+  }
+  .instructions {
+    line-height: 1.6;
+    margin: 1rem 0;
+    border: 1px solid rgba(var(--accent), 25%);
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.4rem;
+  }
+  .instructions code {
+    font-size: 0.875em;
+    font-weight: bold;
+    background: rgba(var(--accent), 12%);
+    color: rgb(var(--accent));
+    border-radius: 4px;
+    padding: 0.3em 0.45em;
+  }
+  .instructions strong {
+    color: rgb(var(--accent));
+  }
+</style>
