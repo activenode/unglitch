@@ -133,7 +133,7 @@ export default function TodoAdd() {
 
   <main class="max-w-5xl mx-auto px-6">
     <div class="max-w-5xl mx-auto">
-      <p class="text-white text-3xl text-center mt-12">
+      <p class="text-white text-3xl text-center mt-12 leading-10">
         This library <strong>can</strong> be used without TypeScript, but all the
         sample code in here is written in TypeScript.
         <span class="text-indigo-200">And why not? It's 2023.</span>
@@ -144,138 +144,162 @@ export default function TodoAdd() {
           <code class="line">npm i unglitch@latest</code>
         </div>
       </div>
+
+      <section>
+        <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
+          What unglitch is
+        </h2>
+
+        <p
+          class="text-gray-200 text-2xl text-center mt-12 leading-10 text-justify"
+        >
+          unglitch was developed with its own vision before the author knew <em
+            >react-query</em
+          >. And that is a good thing because it allowed the mind to be
+          uninfluenced by existing code. It was actually inspired by <em
+            >zustand</em
+          >
+          with the goal to make it even simpler and smaller and being able to avoid
+          side-effects in web applications using the Power of the new Store API in
+          React v18+.
+        </p>
+
+        <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
+          Getting started
+        </h2>
+      </section>
+
+      <ul role="list" class="link-card-grid flex flex-col gap-5">
+        <Card
+          title="Step 1: Create a Store"
+          lang="typescript"
+          file="your_app/utils/store.ts"
+        >
+          {createStoreSample}
+        </Card>
+
+        <Card
+          title="Step 2: Use the Store"
+          lang="typescript"
+          file="your_app/SomeComponent.tsx"
+        >
+          {useStoreSample}
+        </Card>
+
+        <Card
+          title="Updating the Store"
+          lang="typescript"
+          file="your_app/SomeComponent.tsx"
+        >
+          {updateStoreSample}
+        </Card>
+
+        <Card
+          title="Updating the Store the harder way"
+          description="Does the same as the merge sample above"
+          lang="typescript"
+          file="your_app/SomeComponent.tsx"
+        >
+          {updateStoreHardSample}
+        </Card>
+      </ul>
     </div>
-
-    <ul role="list" class="link-card-grid flex flex-col gap-5">
-      <Card
-        title="Step 1: Create a Store"
-        lang="typescript"
-        file="your_app/utils/store.ts"
-      >
-        {createStoreSample}
-      </Card>
-
-      <Card
-        title="Step 2: Use the Store"
-        lang="typescript"
-        file="your_app/SomeComponent.tsx"
-      >
-        {useStoreSample}
-      </Card>
-
-      <Card
-        title="Updating the Store"
-        lang="typescript"
-        file="your_app/SomeComponent.tsx"
-      >
-        {updateStoreSample}
-      </Card>
-
-      <Card
-        title="Updating the Store the harder way"
-        description="Does the same as the merge sample above"
-        lang="typescript"
-        file="your_app/SomeComponent.tsx"
-      >
-        {updateStoreHardSample}
-      </Card>
-    </ul>
   </main>
-</Layout>
 
-<script>
-  import hljs from "highlight.js";
+  <script>
+    import hljs from "highlight.js";
 
-  hljs.highlightAll();
-</script>
+    hljs.highlightAll();
+  </script>
 
-<style>
-  .card-code {
-    @apply mt-2;
-  }
+  <style>
+    .card-code {
+      @apply mt-2;
+    }
 
-  mark {
-    @apply mx-2 inline-block transition-transform rounded relative bg-transparent text-white;
-  }
+    mark {
+      @apply mx-2 inline-block transition-transform rounded relative bg-transparent text-white;
+    }
 
-  mark::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 1.4em;
-    top: 0.17em;
-    z-index: -1;
-    /* border-radius: 0.5rem; */
-    /* background-color: yellow; */
-    border-bottom: 1px solid yellow;
-  }
+    mark::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 1.4em;
+      top: 0.17em;
+      z-index: -1;
+      /* border-radius: 0.5rem; */
+      /* background-color: yellow; */
+      border-bottom: 1px solid yellow;
+    }
 
-  mark.alt {
-    @apply text-white;
-  }
+    mark.alt {
+      @apply text-white;
+    }
 
-  mark.alt::before {
-    @apply bg-gradient-to-r from-[#ff4694] to-[#776fff];
-  }
+    mark.alt::before {
+      @apply bg-gradient-to-r from-[#ff4694] to-[#776fff];
+    }
 
-  a:hover > mark {
-    transform: scale(1.06);
-  }
+    a:hover > mark {
+      transform: scale(1.06);
+    }
 
-  main {
-    margin: auto;
-    padding: 1.5rem 0;
-  }
+    main {
+      margin: auto;
+      padding: 1.5rem 0;
+    }
 
-  h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    margin: 0;
-  }
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin: 0;
+    }
 
-  .instructions {
-    line-height: 1.6;
-    margin: 1rem 0;
-    border: 1px solid rgba(var(--accent), 25%);
-    background-color: white;
-    padding: 1rem;
-    border-radius: 0.4rem;
-  }
-  code.line {
-    font-size: 0.875em;
-    font-weight: bold;
-    background: rgba(var(--accent), 12%);
-    color: rgb(var(--accent));
-    border-radius: 4px;
-    padding: 0.3em 0.45em;
-    display: inline-block;
-  }
+    .instructions {
+      line-height: 1.6;
+      margin: 1rem 0;
+      border: 1px solid rgba(var(--accent), 25%);
+      background-color: white;
+      padding: 1rem;
+      border-radius: 0.4rem;
+    }
+    code.line {
+      font-size: 0.875em;
+      font-weight: bold;
+      background: rgba(var(--accent), 12%);
+      color: rgb(var(--accent));
+      border-radius: 4px;
+      padding: 0.3em 0.45em;
+      display: inline-block;
+    }
 
-  code.alt {
-    color: var(--accent-light);
-    border: 1px solid rgba(var(--accent), 25%);
-    line-height: 1.1em;
-  }
+    code.alt {
+      color: var(--accent-light);
+      border: 1px solid rgba(var(--accent), 25%);
+      line-height: 1.1em;
+    }
 
-  .npmi {
-    @apply p-4  rounded-lg border-2 border-fuchsia-600 border-opacity-25;
-    background: linear-gradient(
-      to right,
-      #0f0c296a,
-      #302b639f,
-      #38243e
-    ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  }
+    .npmi {
+      @apply p-4  rounded-lg border-2 border-fuchsia-600 border-opacity-25;
+      background: linear-gradient(
+        to right,
+        #0f0c296a,
+        #302b639f,
+        #38243e
+      ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
 
-  .npmi code {
-    @apply p-0 px-3 font-extrabold text-2xl md:text-4xl text-fuchsia-200 bg-transparent;
+    .npmi code {
+      @apply p-0 px-3 font-extrabold text-2xl md:text-4xl text-fuchsia-200 bg-transparent;
 
-    /** bg-clip-text bg-gradient-to-r from-purple-400 to-pink-60 text-transparent0
+      /** bg-clip-text bg-gradient-to-r from-purple-400 to-pink-60 text-transparent0
     */
-  }
+    }
 
-  .instructions strong {
-    color: rgb(var(--accent));
-  }
-</style>
+    .instructions strong {
+      color: rgb(var(--accent));
+    }
+  </style>
+</Layout>
