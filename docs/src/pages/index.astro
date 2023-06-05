@@ -40,10 +40,41 @@ export default function App() {
   );
 }
 `.trim();
+
+const updateStoreSample = `
+import { update } from "./utils/store";
+
+export default function App() {
+  return (
+    <Button onClick={() => 
+      update.merge(() => ({
+        todos: ['My new todo']
+      }))
+    }>Add Todo</Button>
+  );
+}
+`.trim();
+
+const updateStoreHardSample = `
+import { update } from "./utils/store";
+
+export default function App() {
+  return (
+    <Button onClick={() => 
+      update((state) => ({
+        todos: [...state.todos, 'My new todo']
+      }))
+    }>Add Todo</Button>
+  );
+}
+`.trim();
 ---
 
 <Layout title="unglitch - THE state manager.">
-  <header class="relative isolate overflow-hidden bg-[#0f1a2c] py-24 sm:py-26">
+  <header
+    class="relative isolate overflow-hidden bg-[#0f1a2c] py-24 sm:py-26"
+    style="background: linear-gradient(to bottom, #450b55, #0f1a2c)"
+  >
     <!-- <div
       class="absolute inset-0 -z-10 h-full w-full blur-xl opacity-60"
       style="background-image: url('/public/unglitch-tile.png'); background-size: 100%"
@@ -123,12 +154,30 @@ export default function App() {
       >
         {createStoreSample}
       </Card>
+
       <Card
         title="Step 2: Use the Store"
         lang="typescript"
         file="your_app/App.tsx"
       >
         {useStoreSample}
+      </Card>
+
+      <Card
+        title="Updating the Store"
+        lang="typescript"
+        file="your_app/App.tsx"
+      >
+        {updateStoreSample}
+      </Card>
+
+      <Card
+        title="Updating the Store the harder way"
+        description="Does the same as the merge sample above"
+        lang="typescript"
+        file="your_app/App.tsx"
+      >
+        {updateStoreHardSample}
       </Card>
     </ul>
   </main>
