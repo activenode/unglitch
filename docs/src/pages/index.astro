@@ -274,10 +274,13 @@ export default function Todos() {
 
         <div class="flex items-center justify-center text-2xl">
           <ul class="text-teal-100 font-normal text-left flex flex-col gap-2">
+            <li class="before:content-['❌']">
+              Deeply nested states are bad and can always be flattened.
+            </li>
             <li class="before:content-['✅']">
-              <span class="pl-1">
-                Managing data should be easy and predictable.
-              </span>
+              <span class="pl-1"
+                >Be small. Be fast. Be simple. Be predictable.</span
+              >
             </li>
             <li class="before:content-['✅']">
               <span class="pl-1">
@@ -296,12 +299,7 @@ export default function Todos() {
               <span class="pl-1">Do not blow up the memory</span>
             </li>
             <li class="before:content-['✅']">
-              <span class="pl-1">
-                Update from anywhere without caring about the lifecycle
-              </span>
-            </li>
-            <li class="before:content-['✅']">
-              <span class="pl-1"> Be small. Be fast. Be simple.</span>
+              <span class="pl-1">Updating (foreign) data must be easy</span>
             </li>
           </ul>
         </div>
