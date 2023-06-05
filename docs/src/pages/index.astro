@@ -26,7 +26,7 @@ export const {
 const useStoreSample = `
 import { useStore } from "./utils/store";
 
-export default function App() {
+export default function Todos() {
   const [ todos ] = useStore(
     state => state.todos
   );
@@ -44,7 +44,7 @@ export default function App() {
 const updateStoreSample = `
 import { update } from "./utils/store";
 
-export default function App() {
+export default function TodoAdd() {
   return (
     <Button onClick={() => 
       update.merge(() => ({
@@ -58,7 +58,7 @@ export default function App() {
 const updateStoreHardSample = `
 import { update } from "./utils/store";
 
-export default function App() {
+export default function TodoAdd() {
   return (
     <Button onClick={() => 
       update((state) => ({
@@ -158,7 +158,7 @@ export default function App() {
       <Card
         title="Step 2: Use the Store"
         lang="typescript"
-        file="your_app/App.tsx"
+        file="your_app/SomeComponent.tsx"
       >
         {useStoreSample}
       </Card>
@@ -166,7 +166,7 @@ export default function App() {
       <Card
         title="Updating the Store"
         lang="typescript"
-        file="your_app/App.tsx"
+        file="your_app/SomeComponent.tsx"
       >
         {updateStoreSample}
       </Card>
@@ -175,7 +175,7 @@ export default function App() {
         title="Updating the Store the harder way"
         description="Does the same as the merge sample above"
         lang="typescript"
-        file="your_app/App.tsx"
+        file="your_app/SomeComponent.tsx"
       >
         {updateStoreHardSample}
       </Card>
