@@ -132,7 +132,7 @@ export default function TodoAdd() {
   </header>
 
   <main class="max-w-5xl mx-auto px-6">
-    <div class="max-w-5xl mx-auto">
+    <div>
       <p class="text-white text-3xl text-center mt-12 leading-10">
         This library <strong>can</strong> be used without TypeScript, but all the
         sample code in here is written in TypeScript.
@@ -150,9 +150,7 @@ export default function TodoAdd() {
           What unglitch is
         </h2>
 
-        <p
-          class="text-gray-200 text-2xl text-center mt-12 leading-10 text-justify"
-        >
+        <p class="text-gray-200 text-2xl mt-12 leading-10 text-justify">
           unglitch was developed with its own vision before the author knew <em
             >react-query</em
           >. And that is a good thing because it allowed the mind to be
@@ -164,11 +162,18 @@ export default function TodoAdd() {
           React v18+.
         </p>
 
-        <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
-          Getting started
+        <h2 class="text-white text-4xl font-semibold text-center mt-28 mb-6">
+          Core Principles
+
+          <ul class="text-lg mt-8">
+            <li>You know your App, you know the Shape of your State</li>
+          </ul>
         </h2>
       </section>
 
+      <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
+        Getting started
+      </h2>
       <ul role="list" class="link-card-grid flex flex-col gap-5">
         <Card
           title="Step 1: Create a Store"
