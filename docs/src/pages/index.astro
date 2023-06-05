@@ -3,6 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import "highlight.js/styles/github.css";
 import "../styles/globals.css";
+import SrcPackage from "../../../package.json";
+
+const latestVersion = SrcPackage.version;
 
 const createStoreSample = `
 import { create } from "unglitch";
@@ -223,10 +226,14 @@ export default function Todos() {
         <span class="text-indigo-200">And why not? It's 2023.</span>
       </p>
 
-      <div class="flex justify-center mb-12 mt-12">
+      <div class="flex flex-col items-center justify-center mt-24">
         <div class="npmi">
           <code class="line">npm i unglitch@latest</code>
         </div>
+
+        <code class="text-fuchsia-300 opacity-80 font-mono p-2"
+          >v{latestVersion}</code
+        >
       </div>
 
       <section>
