@@ -265,46 +265,57 @@ export default function Todos() {
           side-effects in web applications using the Power of the new Store API in
           React v18+.
         </p>
+      </section>
 
+      <section>
         <h2 class="text-white text-4xl font-semibold text-center mt-28 mb-6">
           Core Principles
-
-          <div class="flex items-center justify-center">
-            <ul
-              class="text-xl mt-8 text-teal-100 font-normal text-left flex flex-col gap-2"
-            >
-              <li class="before:content-['✅']">
-                <span class="pl-1">
-                  Managing data should be 1. easy and 2. predictable.
-                </span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1">
-                  Prevent unnecessary fetches (via Locking).
-                </span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1">
-                  You know your App, you know the Shape of your State
-                </span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1">Your store is your cache</span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1">Do not blow up the memory</span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1">
-                  Update from anywhere without caring about the lifecycle
-                </span>
-              </li>
-              <li class="before:content-['✅']">
-                <span class="pl-1"> Be small. Be fast. Be simple.</span>
-              </li>
-            </ul>
-          </div>
         </h2>
+
+        <div class="flex items-center justify-center text-2xl">
+          <ul class="text-teal-100 font-normal text-left flex flex-col gap-2">
+            <li class="before:content-['✅']">
+              <span class="pl-1">
+                Managing data should be easy and predictable.
+              </span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1">
+                Prevent unnecessary fetches (<em>Lock'n'Release</em>).
+              </span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1">
+                You know your App, you know the Shape of your State
+              </span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1">Your store is your cache</span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1">Do not blow up the memory</span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1">
+                Update from anywhere without caring about the lifecycle
+              </span>
+            </li>
+            <li class="before:content-['✅']">
+              <span class="pl-1"> Be small. Be fast. Be simple.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="text-center">
+        <h2 class="text-white text-3xl font-semibold mt-28 mb-6">
+          Why isn't unglitch caching every request?
+        </h2>
+
+        <p class="text-gray-200 text-xl leading-10">
+          Read the Core Principles again. <br /> Caching unnecessary data only to
+          throw it away later is a waste of memory.
+        </p>
       </section>
 
       <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
