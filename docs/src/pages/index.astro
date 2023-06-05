@@ -165,9 +165,18 @@ export default function TodoAdd() {
         <h2 class="text-white text-4xl font-semibold text-center mt-28 mb-6">
           Core Principles
 
-          <ul class="text-lg mt-8">
-            <li>You know your App, you know the Shape of your State</li>
-          </ul>
+          <div class="flex items-center justify-center">
+            <ul
+              class="text-xl mt-8 text-teal-100 font-normal text-left flex flex-col gap-2"
+            >
+              <li class="before:content-['✅']">
+                You know your App, you know the Shape of your State
+              </li>
+              <li class="before:content-['✅']">
+                Everything is properly typed (when using TypeScript)
+              </li>
+            </ul>
+          </div>
         </h2>
       </section>
 
