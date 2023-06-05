@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import "highlight.js/styles/github.css";
+import "../styles/globals.css";
 
 const createStoreSample = `
 import { create } from "unglitch";
@@ -42,12 +43,12 @@ export default function App() {
 ---
 
 <Layout title="unglitch - THE state manager.">
-  <header class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-26">
-    <div
+  <header class="relative isolate overflow-hidden bg-[#0f1a2c] py-24 sm:py-26">
+    <!-- <div
       class="absolute inset-0 -z-10 h-full w-full blur-xl opacity-60"
       style="background-image: url('/public/unglitch-tile.png'); background-size: 100%"
     >
-    </div>
+    </div> -->
 
     <div
       class="absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
@@ -114,7 +115,7 @@ export default function App() {
       </div>
     </div>
 
-    <ul role="list" class="link-card-grid flex flex-col gap-2">
+    <ul role="list" class="link-card-grid flex flex-col gap-5">
       <Card
         title="Step 1: Create a Store"
         lang="typescript"
@@ -219,7 +220,10 @@ export default function App() {
   }
 
   .npmi code {
-    @apply p-0 px-3 font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600;
+    @apply p-0 px-3 font-extrabold text-2xl md:text-4xl text-fuchsia-200 bg-transparent;
+
+    /** bg-clip-text bg-gradient-to-r from-purple-400 to-pink-60 text-transparent0
+    */
   }
 
   .instructions strong {

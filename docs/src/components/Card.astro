@@ -50,8 +50,7 @@ const { title, lang, file } = Astro.props;
 		padding: 1rem 1.3rem;
 		border-radius: 0.35rem;
 		color: #111;
-		background-color: white;
-		opacity: 0.8;
+		background-color: rgba(255, 255, 255, 0.964);
 	}
 
 	p {
@@ -59,7 +58,7 @@ const { title, lang, file } = Astro.props;
 		margin-bottom: 0;
 		color: #444;
 	}
-	.card:is(:hover, :focus-within) {
+	.card {
 		background-position: 0;
 		background-image: var(--accent-gradient);
 	}
