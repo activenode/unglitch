@@ -68,6 +68,90 @@ export default function TodoAdd() {
   );
 }
 `.trim();
+
+const fetchDataSampleSimple = `
+import { useFetchData } from "./utils/store";
+import fetchTodosFromApi from "./api-todos";
+
+export default function Todos() {
+  const { isFetching, data: todos } = useFetchData(async (update) => {
+    return fetchTodosFromApi();
+  },
+  {
+    onSuccess: (update, dataFromApi) => {
+      // assuming dataFromApi is {status, error, data}
+
+      update.merge(() => ({
+        todos: dataFromApi.data
+      }));
+    },
+    data: (state, isFetching) => state.todos,
+    // the token makes sure that the data is only 
+    // fetched in one place with the same token
+    token: 'fetch_todos'
+  });
+
+  return (
+    <>
+      {isFetching && <p>Loading fresh data...</p>}
+      <ul>
+        {todos.map((todo) => (
+          <li>{todo}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+`.trim();
+
+const refreshDataSample = `
+import { useFetchData } from "./utils/store";
+import fetchTodosFromApi from "./api-todos";
+
+export default function Todos() {
+  const { isFetching, data: todos, refresh } = useFetchData(
+    /** ... */
+  );
+
+  return (
+    <>
+      {isFetching && <p>Loading fresh data...</p>}
+
+      <Button onClick={refresh}>Refresh Todos</Button>
+      <p>
+        You can DDOS-click this button. As long as a request is running
+        no other request will be fired
+      </p>
+
+      <ul>
+        {todos.map((todo) => (
+          <li>{todo}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+`.trim();
+
+const refreshDataSampleInterval = `
+import { useFetchData } from "./utils/store";
+import fetchTodosFromApi from "./api-todos";
+
+export default function Todos() {
+  const { isFetching, data: todos, refresh } = useFetchData(
+    /** ... */,
+    {
+      refreshInterval: 5000 // every 5 seconds
+    }
+  );
+
+  return (
+    <>
+      {/** ... */}
+    </>
+  );
+}
+`.trim();
 ---
 
 <Layout title="unglitch - THE state manager.">
@@ -176,6 +260,11 @@ export default function TodoAdd() {
               </li>
               <li class="before:content-['✅']">
                 <span class="pl-1">
+                  Prevent unnecessary fetches (via Locking).
+                </span>
+              </li>
+              <li class="before:content-['✅']">
+                <span class="pl-1">
                   You know your App, you know the Shape of your State
                 </span>
               </li>
@@ -201,6 +290,7 @@ export default function TodoAdd() {
       <h2 class="text-white text-5xl font-semibold text-center mt-36 mb-6">
         Getting started
       </h2>
+
       <ul role="list" class="link-card-grid flex flex-col gap-5">
         <Card
           title="Step 1: Create a Store"
@@ -235,7 +325,54 @@ export default function TodoAdd() {
           {updateStoreHardSample}
         </Card>
       </ul>
+
+      <h2 class="text-white text-4xl font-semibold text-center mt-36 mb-6">
+        Fetching Data
+      </h2>
+
+      <ul role="list" class="link-card-grid flex flex-col gap-5">
+        <Card
+          title="useFetchData Basic"
+          lang="typescript"
+          file="your_app/AnyComponent.tsx"
+        >
+          {fetchDataSampleSimple}
+        </Card>
+      </ul>
+
+      <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
+        Refreshing Data
+      </h3>
+
+      <ul role="list" class="link-card-grid flex flex-col gap-5">
+        <Card
+          title="useFetchData / refresh"
+          lang="typescript"
+          file="your_app/AnyComponent.tsx"
+        >
+          {refreshDataSample}
+        </Card>
+
+        <Card
+          title="useFetchData / refreshInterval"
+          lang="typescript"
+          file="your_app/AnyComponent.tsx"
+        >
+          {refreshDataSampleInterval}
+        </Card>
+      </ul>
+
+      <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
+        Controlling the Fetch
+      </h3>
+
+      <p class="text-center text-white text-lg">
+        Docs coming soon for: `waitFor`, `allow`, `getRealtime` and
+        `getSnapshot`. <strong>Stay tuned</strong>.
+      </p>
     </div>
+
+    <div class="h-32"></div>
   </main>
 
   <script>

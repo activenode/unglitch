@@ -3,9 +3,10 @@ export interface Props {
 	title: string;
 	lang: string;
 	file?: string;
+	description?: string;
 }
 
-const { title, lang, file } = Astro.props;
+const { title, lang, file, description } = Astro.props;
 ---
 
 <li class="card">
@@ -16,7 +17,15 @@ const { title, lang, file } = Astro.props;
 
 		{!!file && <strong class="file">{file}</strong>}
 
-		<div>
+		{
+			!!description && (
+				<p class="bg-slate-700 text-white text-sm p-2 border border-slate-900 my-3 shadow-lg">
+					{description}
+				</p>
+			)
+		}
+
+		<div class="text-lg">
 			<pre
 				class="card-code"><code class={`language-${lang}`}><slot /></code></pre>
 		</div>
