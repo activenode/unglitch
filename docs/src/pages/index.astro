@@ -391,14 +391,43 @@ export default function Todos() {
         </Card>
       </ul>
 
-      <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
-        Controlling the Fetch
-      </h3>
-
       <p class="text-center text-white text-lg">
         Docs coming soon for: `waitFor`, `allow`, `getRealtime` and
         `getSnapshot`. <strong>Stay tuned</strong>.
       </p>
+
+      <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
+        Controlling the Fetch
+      </h3>
+
+      <ul role="list" class="link-card-grid flex flex-col gap-5">
+        <!-- <Card
+          title="getSnapshot"
+          lang="typescript"
+          description=""
+          file="your_app/AnyComponent.tsx"
+        >
+          {refreshDataSample}
+        </Card> -->
+      </ul>
+
+      <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
+        Realtime Data
+      </h3>
+
+      <div>
+        <p>
+          Data inside of a component is never realtime. It is always a snapshot
+          of the current rendering cycle.
+        </p>
+        <p>Normally you don't notice and normally you also don't need to.</p>
+        <p>
+          Let's elaborate on the problem for you to understand if and when you
+          might need realtime data.
+        </p>
+      </div>
+
+      tbd
     </div>
 
     <div class="h-32"></div>

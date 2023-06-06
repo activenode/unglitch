@@ -50,7 +50,7 @@ const createStore = <GlobalState extends object = {}>(
       updater: PartialStateReturner | PartialState,
       options?: { forceUpdate?: boolean; merge?: boolean }
     ): void;
-    merge: (updater: PartialStateReturner) => void;
+    merge: (updater: PartialStateReturner | PartialState) => void;
   };
 
   let update: updateFn = ((
@@ -119,7 +119,7 @@ const createStore = <GlobalState extends object = {}>(
     }
   }) as updateFn;
 
-  update.merge = (updater: PartialStateReturner) => {
+  update.merge = (updater) => {
     update(updater, { merge: true });
   };
 

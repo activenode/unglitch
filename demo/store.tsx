@@ -1,13 +1,13 @@
 import { create } from "../src";
 
 type MyState = {
-  foo: boolean;
-  bar: string;
+  todos: string[];
+  time: string;
 };
 
 const store = create<MyState>(() => ({
-  foo: false,
-  bar: "hello",
+  todos: [],
+  time: new Date().toLocaleTimeString(),
 }));
 
 export const { useStore, getSnapshot, update, useFetchData } = store;
