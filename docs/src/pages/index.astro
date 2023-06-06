@@ -234,6 +234,42 @@ export const backupTheStateForWhateverReason = () => {
   }, 10000);
 }
 `.trim();
+
+const getRealtimeSample = `
+import { useStore } from "./utils/store";
+
+/**
+ * Assume initial data is:
+ * todos = ['My first todo']
+ */
+
+export default function Todos() {
+  const [ todos, realtimeTodos ] = useStore(
+    state => state.todos
+  );
+
+  useEffect(() => {
+    update.merge({ todos: ['My second todo'] });
+  }, []);
+
+  useEffect(() => {
+    // your function closure has a todo variable 
+    // with ONE entry ( ["My first todo"] )
+
+    // if, for whatever reason, you need the state
+    // in realtime, so ignoring the current function closure / lifecycle
+    // you can use  
+    const _todos = realtimeTodos();
+
+    // again: normally you don't need this. 
+    // because react will re-render with the new state
+  }, []);
+
+  return (
+    // ...
+  );
+}
+`.trim();
 ---
 
 <Layout title="unglitch - THE state manager.">
@@ -539,7 +575,7 @@ export const backupTheStateForWhateverReason = () => {
 
       <ul role="list" class="link-card-grid flex flex-col gap-5">
         <Card
-          title="getSnapshot: Getting the whole state in this exact millisecond"
+          title="getSnapshot"
           lang="typescript"
           file="your_app/utils/backup.ts"
         >
@@ -549,6 +585,20 @@ export const backupTheStateForWhateverReason = () => {
             This function is probably the least you want to use within your
             React components. A use-case for this function is the connection to
             other services / libraries.
+          </div>
+        </Card>
+
+        <Card
+          title="getRealtime"
+          lang="typescript"
+          file="your_app/utils/YourComponent.tsx"
+        >
+          {getRealtimeSample}
+
+          <div class="card-desc" slot="description">
+            Also use this one carefully. If you use it too often you might
+            simply be having an architectural problem. But it's more likely to
+            need this than <code>getSnapshot</code>
           </div>
         </Card>
       </ul>
