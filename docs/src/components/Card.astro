@@ -3,27 +3,24 @@ export interface Props {
 	title: string;
 	lang: string;
 	file?: string;
-	description?: string;
 }
 
-const { title, lang, file, description } = Astro.props;
+const { title, lang, file } = Astro.props;
 ---
 
 <li class="card">
 	<div class="text-xl">
-		<h2 class="mb-4 font-bold">
+		<h2
+			class="mb-4 py-4 font-bold bg-fuchsia-800 text-white full-width padd-back"
+		>
 			{title}
 		</h2>
 
 		{!!file && <strong class="file">{file}</strong>}
 
-		{
-			!!description && (
-				<p class="bg-slate-700 text-white text-sm p-2 border border-slate-900 my-3 shadow-lg">
-					{description}
-				</p>
-			)
-		}
+		<div class="description-wrapper">
+			<slot name="description" />
+		</div>
 
 		<div class="text-lg">
 			<pre
@@ -46,6 +43,21 @@ const { title, lang, file, description } = Astro.props;
 			0 2px 4px -2px rgba(0, 0, 0, 0.1);
 	}
 
+	.full-width {
+		margin-left: -1.3rem;
+		margin-right: -1.3rem;
+	}
+
+	.padd-back {
+		padding-left: 1.45rem;
+		padding-right: 1.45rem;
+	}
+
+	.description-wrapper {
+		margin-left: -1.5rem;
+		margin-right: -1.5rem;
+	}
+
 	.file {
 		@apply text-base px-3 py-1 rounded-lg mb-2 inline-block font-mono;
 		background: rgba(var(--accent), 12%);
@@ -56,7 +68,7 @@ const { title, lang, file, description } = Astro.props;
 		width: 100%;
 		text-decoration: none;
 		line-height: 1.4;
-		padding: 1rem 1.3rem;
+		padding: 0 1.3rem;
 		border-radius: 0.35rem;
 		color: #111;
 		background-color: rgba(255, 255, 255, 0.964);
@@ -70,8 +82,5 @@ const { title, lang, file, description } = Astro.props;
 	.card {
 		background-position: 0;
 		background-image: var(--accent-gradient);
-	}
-	.card:is(:hover, :focus-within) h2 {
-		color: rgb(var(--accent));
 	}
 </style>

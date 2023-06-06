@@ -156,6 +156,84 @@ export default function Todos() {
   );
 }
 `.trim();
+
+const waitForSample = `
+import { useFetchData } from "./utils/store";
+import fetchUserCommentsFromApi from "./api-user";
+
+export default function UserComments() {
+  // useAuthUser represents a hook in this sample
+  // which returns a user object when logged in, else null 
+  const user = useAuthUser(); 
+
+  const { isFetching, data: userComments, waitFor } = useFetchData(
+    async (update, user) => {
+      // update is the store update function
+      // user is the user object from useAuthUser
+
+      // you dont have to check if "user" is truthy because
+      // waitFor will wait until the user object is truthy
+      // if never: it will never execute
+      return fetchUserCommentsFromApi(user.id);
+    },
+    {
+      waitFor: [user] 
+    }
+  );
+
+  return (
+    <>
+      {isFetching && <p>Loading your comments...</p>}
+      {userComments.map((comment) => (
+        <p>{comment}</p>
+      ))}
+    </>
+  );
+}
+`.trim();
+
+const allowSample = `
+import { useFetchData } from "./utils/store";
+
+
+export default function ConditionalFetch() {
+  const user = useAuthUser();
+
+  const fetchAdminInfo = useFetchData(
+    async (update, user) => {
+      // ... your fetch
+    },
+    {
+      waitFor: [user],
+      allow: (isInitialFetch: boolean) => user.isAdmin
+    }
+  );
+
+  // ...
+}
+`.trim();
+
+const getSnapshotSample = `
+import { getSnapshot } from "./utils/store";
+
+export const backupTheStateForWhateverReason = () => {
+  // we want to make backup every 10 seconds 
+
+  setInterval(() => {
+    const snapshot = getSnapshot();
+
+    sendToServer(snapshot);
+
+    // send the snapshot to your server
+    // or save it in local storage or whatever
+    // you can also use the snapshot to restore the state
+    
+
+    // so snapshot really is just a plain object
+    // giving you the realtime state of your store
+  }, 10000);
+}
+`.trim();
 ---
 
 <Layout title="unglitch - THE state manager.">
@@ -347,11 +425,15 @@ export default function Todos() {
 
         <Card
           title="Updating the Store the harder way"
-          description="Does the same as the merge sample above"
           lang="typescript"
           file="your_app/SomeComponent.tsx"
         >
           {updateStoreHardSample}
+
+          <div class="card-desc" slot="description">
+            Does the same as the merge sample above. In the given use-case you
+            probably wouldn't want that. But it's good to know the difference.
+          </div>
         </Card>
       </ul>
 
@@ -391,142 +473,189 @@ export default function Todos() {
         </Card>
       </ul>
 
-      <p class="text-center text-white text-lg">
-        Docs coming soon for: `waitFor`, `allow`, `getRealtime` and
-        `getSnapshot`. <strong>Stay tuned</strong>.
-      </p>
-
       <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
         Controlling the Fetch
       </h3>
 
       <ul role="list" class="link-card-grid flex flex-col gap-5">
-        <!-- <Card
-          title="getSnapshot"
+        <Card
+          title="waitFor: Waiting for dependencies"
           lang="typescript"
-          description=""
           file="your_app/AnyComponent.tsx"
         >
-          {refreshDataSample}
-        </Card> -->
+          {waitForSample}
+
+          <div class="card-desc" slot="description">
+            waitFor is a nice mechanism to remove all boilerplate around if-ing.
+            Pass the must-have variables that are required to run the fetch and
+            it will only fetch when all of them are available. The underlying
+            mechanism is <code
+              >waitForDeps.current.every(nonNullOrUndefined)</code
+            >
+          </div>
+        </Card>
+
+        <Card
+          title="allow: Finer control when to execute the fetch"
+          lang="typescript"
+          file="your_app/AnyComponent.tsx"
+        >
+          {allowSample}
+
+          <div class="card-desc" slot="description">
+            <p>
+              <code>allow</code> is a complementary mechanism to <code
+                >waitFor</code
+              >. While <code>waitFor</code> very explicitly checks for nullish/undefined
+              <code>allow</code> is a function that when returning false will prevent
+              the fetch, no matter how it is triggered.
+            </p>
+
+            <p class="mt-3">
+              This might be especially useful if you wanna e.g. prevent the
+              "initial fetch" because you only want to fetch explicitly via the
+              refresh function.
+            </p>
+          </div>
+        </Card>
       </ul>
 
       <h3 class="text-white text-3xl font-semibold text-center mt-36 mb-6">
-        Realtime Data
+        ⚡️ Realtime Data / getSnapshot
       </h3>
 
-      <div>
-        <p>
-          Data inside of a component is never realtime. It is always a snapshot
-          of the current rendering cycle.
+      <div class="card-desc">
+        <p class="font-bold">
+          There is only rare / specific cases where you need realtime data. So
+          don't make this your go-to solution.
         </p>
-        <p>Normally you don't notice and normally you also don't need to.</p>
-        <p>
-          Let's elaborate on the problem for you to understand if and when you
-          might need realtime data.
+
+        <p class="mt-3">
+          Data inside of a React component is never a realtime snapshot. It is
+          always a snapshot of the current rendering cycle. That's how React
+          works.
         </p>
       </div>
 
-      tbd
+      <ul role="list" class="link-card-grid flex flex-col gap-5">
+        <Card
+          title="getSnapshot: Getting the whole state in this exact millisecond"
+          lang="typescript"
+          file="your_app/utils/backup.ts"
+        >
+          {getSnapshotSample}
+
+          <div class="card-desc" slot="description">
+            This function is probably the least you want to use within your
+            React components. A use-case for this function is the connection to
+            other services / libraries.
+          </div>
+        </Card>
+      </ul>
+
+      <div class="h-32"></div>
     </div>
 
-    <div class="h-32"></div>
-  </main>
+    <script>
+      import hljs from "highlight.js";
 
-  <script>
-    import hljs from "highlight.js";
+      hljs.highlightAll();
+    </script>
 
-    hljs.highlightAll();
-  </script>
+    <style>
+      .card-code {
+        @apply mt-2;
+      }
 
-  <style>
-    .card-code {
-      @apply mt-2;
-    }
+      mark {
+        @apply mx-2 inline-block transition-transform rounded relative bg-transparent text-white;
+      }
 
-    mark {
-      @apply mx-2 inline-block transition-transform rounded relative bg-transparent text-white;
-    }
+      mark::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 1.4em;
+        top: 0.17em;
+        z-index: -1;
+        /* border-radius: 0.5rem; */
+        /* background-color: yellow; */
+        border-bottom: 1px solid yellow;
+      }
 
-    mark::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 1.4em;
-      top: 0.17em;
-      z-index: -1;
-      /* border-radius: 0.5rem; */
-      /* background-color: yellow; */
-      border-bottom: 1px solid yellow;
-    }
+      mark.alt {
+        @apply text-white;
+      }
 
-    mark.alt {
-      @apply text-white;
-    }
+      mark.alt::before {
+        @apply bg-gradient-to-r from-[#ff4694] to-[#776fff];
+      }
 
-    mark.alt::before {
-      @apply bg-gradient-to-r from-[#ff4694] to-[#776fff];
-    }
+      a:hover > mark {
+        transform: scale(1.06);
+      }
 
-    a:hover > mark {
-      transform: scale(1.06);
-    }
+      main {
+        margin: auto;
+        padding: 1.5rem 0;
+      }
 
-    main {
-      margin: auto;
-      padding: 1.5rem 0;
-    }
+      h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0;
+      }
 
-    h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin: 0;
-    }
+      .instructions {
+        line-height: 1.6;
+        margin: 1rem 0;
+        border: 1px solid rgba(var(--accent), 25%);
+        background-color: white;
+        padding: 1rem;
+        border-radius: 0.4rem;
+      }
+      code.line,
+      .card-desc code {
+        font-size: 0.875em;
+        font-weight: bold;
+        background: rgba(var(--accent), 12%);
+        color: rgb(var(--accent));
+        border-radius: 4px;
+        padding: 0.3em 0.45em;
+        display: inline-block;
+      }
 
-    .instructions {
-      line-height: 1.6;
-      margin: 1rem 0;
-      border: 1px solid rgba(var(--accent), 25%);
-      background-color: white;
-      padding: 1rem;
-      border-radius: 0.4rem;
-    }
-    code.line {
-      font-size: 0.875em;
-      font-weight: bold;
-      background: rgba(var(--accent), 12%);
-      color: rgb(var(--accent));
-      border-radius: 4px;
-      padding: 0.3em 0.45em;
-      display: inline-block;
-    }
+      code.alt {
+        color: var(--accent-light);
+        border: 1px solid rgba(var(--accent), 25%);
+        line-height: 1.1em;
+      }
 
-    code.alt {
-      color: var(--accent-light);
-      border: 1px solid rgba(var(--accent), 25%);
-      line-height: 1.1em;
-    }
+      .npmi {
+        @apply p-4  rounded-lg border-2 border-fuchsia-600 border-opacity-25;
+        background: linear-gradient(
+          to right,
+          #0f0c296a,
+          #302b639f,
+          #38243e
+        ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      }
 
-    .npmi {
-      @apply p-4  rounded-lg border-2 border-fuchsia-600 border-opacity-25;
-      background: linear-gradient(
-        to right,
-        #0f0c296a,
-        #302b639f,
-        #38243e
-      ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    }
+      .npmi code {
+        @apply p-0 px-3 font-extrabold text-2xl md:text-4xl text-fuchsia-200 bg-transparent;
 
-    .npmi code {
-      @apply p-0 px-3 font-extrabold text-2xl md:text-4xl text-fuchsia-200 bg-transparent;
-
-      /** bg-clip-text bg-gradient-to-r from-purple-400 to-pink-60 text-transparent0
+        /** bg-clip-text bg-gradient-to-r from-purple-400 to-pink-60 text-transparent0
     */
-    }
+      }
 
-    .instructions strong {
-      color: rgb(var(--accent));
-    }
-  </style>
+      .instructions strong {
+        color: rgb(var(--accent));
+      }
+
+      .card-desc {
+        @apply bg-slate-200 text-slate-800 text-base p-3 border border-slate-300 my-3 shadow-lg;
+      }
+    </style>
+  </main>
 </Layout>
