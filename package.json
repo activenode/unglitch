@@ -1,6 +1,6 @@
 {
   "name": "unglitch",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Yes. React 18+ only and not planning to port to anything else. Get your sh*t up-to-date.",
   "main": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -15,7 +15,8 @@
   "exports": {
     ".": {
       "require": "./dist/cjs/index.min.cjs",
-      "import": "./dist/esm/index.min.mjs"
+      "import": "./dist/esm/index.min.mjs",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "files": [
